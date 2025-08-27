@@ -18,7 +18,7 @@ include(FetchContent)
 FetchContent_Declare(
     fusion_engine_client
     GIT_REPOSITORY https://github.com/PointOneNav/fusion-engine-client.git
-    GIT_TAG v1.18.0
+    GIT_TAG origin/master
 )
 FetchContent_Populate(fusion_engine_client)
 add_subdirectory(${fusion_engine_client_SOURCE_DIR} ${fusion_engine_client_BINARY_DIR})
