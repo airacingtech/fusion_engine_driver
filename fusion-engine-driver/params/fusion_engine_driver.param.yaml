@@ -1,0 +1,7 @@
+/**:
+  ros__parameters:
+    use_sim_time: false
+    udp_port: 30200
+    connection_type: "tcp"
+    tcp_ip: "10.42.7.211"
+    tcp_port: 30201
