@@ -105,23 +105,6 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
   } else if (header.message_type == MessageType::ROS_IMU)  {
     ros_imu_ = *reinterpret_cast<
 	    const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
-    /* Per the ROS IMU message specification:
-      * - If the a value is known but its covariance is not, its covariance matrix
-      *   will be set to 0.0
-      * - If a value is not known or not available, its covariance matrix will be set
-      *   to -1.0
-      *   - The value itself will be set to `NAN`, as this is not specified in the
-      *   ROS message definition
-      */
-    auto sanitize_cov = [](double (&cov)[9]) {
-	    std::replace_if(std::begin(cov), std::end(cov),
-			    [](double v){ return std::isnan(v) || v == -1.0; },
-			    std::numeric_limits<double>::quiet_NaN());
-    };
-
-    sanitize_cov(ros_imu_.orientation_covariance);
-    sanitize_cov(ros_imu_.angular_velocity_covariance);
-    sanitize_cov(ros_imu_.acceleration_covariance);
   } else if (header.message_type == MessageType::ROS_POSE) {	  
     auto &contents = *reinterpret_cast<
         const point_one::fusion_engine::messages::ros::PoseMessage *>(payload);
