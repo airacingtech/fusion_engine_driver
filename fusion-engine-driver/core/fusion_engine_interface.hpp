@@ -72,6 +72,11 @@ class FusionEngineInterface {
   void messageReceived(const MessageHeader& header, const void* payload_in);
 
   /**
+   * Helper function for dumping raw tcp hex values
+   */
+  void dumpHex(const MessageHeader& header, const uint8_t* payload);
+
+  /**
    * @brief Call fusion engine decoder.
    *
    * @param frame Message content.

@@ -39,18 +39,21 @@ void FusionEngineInterface::initialize(rclcpp::Node* node,
 void FusionEngineInterface::messageReceived(const MessageHeader& header,
                                             const void* payload_in) {
   auto payload = static_cast<const uint8_t*>(payload_in);
-
-  if (header.message_type == MessageType::ROS_IMU) {
-    printf("[ROS_IMU] Payload (%u bytes):\n", header.payload_size_bytes);
-    for (uint32_t i = 0; i < header.payload_size_bytes; i++) {
-      printf("%02X ", payload[i]);
-      if ((i + 1) % 8 == 0) printf("\n");  // pretty formatting
-    }
-    printf("\n");
-  }
+  //dumpHex(header, payload);
   publisher(header, payload);
 }
 
+/******************************************************************************/
+void FusionEngineInterface::dumpHex(const MessageHeader& header, const uint8_t* payload) {
+  if (header.message_type == MessageType::ROS_IMU) {
+	  printf("[ROS_IMU] Payload (%u bytes):\n", header.payload_size_bytes);
+	  for (uint32_t i = 0; i < header.payload_size_bytes; i++) {
+		  printf("%02X ", payload[i]);
+		  if ((i + 1) % 8 == 0) printf("\n");  // 8 Bytes, according to PON Manual.
+	  }
+	  printf("\n");
+  }
+}
 /******************************************************************************/
 void FusionEngineInterface::decodeFusionEngineMessage(uint8_t* frame,
                                                       size_t bytes_read) {
