@@ -105,7 +105,6 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
   } else if (header.message_type == MessageType::ROS_IMU)  {
     ros_imu_ = *reinterpret_cast<
 	    const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
-     
     /* Per the ROS IMU message specification:
       * - If the a value is known but its covariance is not, its covariance matrix
       *   will be set to 0.0
