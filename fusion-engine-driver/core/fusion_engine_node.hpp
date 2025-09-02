@@ -118,7 +118,7 @@ class FusionEngineNode : public rclcpp::Node {
    */
   rclcpp::TimerBase::SharedPtr timer_;
   /**
-   * @brief Number of sallite used for GNSS.
+   * @brief Number of satellite used for GNSS.
    */
 
   uint8_t satellite_used_;

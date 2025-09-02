@@ -85,7 +85,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     publishNavFixMsg(gps_fix);
   } else if (header.message_type == MessageType::IMU_OUTPUT) {
     auto &contents = *reinterpret_cast<
-	const point_one::fusion_engine::messages::IMUOutput*>(payload); 	
+	const point_one::fusion_engine::messages::IMUOutput*>(payload);
     sensor_msgs::msg::Imu imu = ConversionUtils::toImu(contents);
     imu.header.frame_id = frame_id_;
     imu.header.stamp = time;
@@ -116,9 +116,10 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
       */
     auto sanitize_cov = [](double (&cov)[9]) {
 	    std::replace_if(std::begin(cov), std::end(cov),
-                  [](double v){ return std::isnan(v); },
-                  -1.0);
+			    [](double v){ return std::isnan(v) || v == -1.0; },
+			    std::numeric_limits<double>::quiet_NaN());
     };
+
     sanitize_cov(ros_imu_.orientation_covariance);
     sanitize_cov(ros_imu_.angular_velocity_covariance);
     sanitize_cov(ros_imu_.acceleration_covariance);
