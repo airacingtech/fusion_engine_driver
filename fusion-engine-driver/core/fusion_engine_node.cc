@@ -12,7 +12,8 @@ FusionEngineNode::FusionEngineNode()
   this->declare_parameter("tty_port", "/dev/ttyUSB0");
   this->declare_parameter("tcp_port", 12345);
   this->declare_parameter("debug", false);
-  frame_id_ = "";
+  this->declare_parameter("frame_id", "cg");
+  frame_id_ = this->get_parameter("frame_id").as_string();
   timer_ =
       create_wall_timer(std::chrono::milliseconds(1),
                         std::bind(&FusionEngineNode::rosServiceLoop, this));
@@ -78,15 +79,50 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     gps_msgs::msg::GPSFix gps_fix = ConversionUtils::toGPSFix(contents);
     gps_fix.header.frame_id = frame_id_;
     gps_fix.header.stamp = time;
+    gps_fix.status.satellites_visible = satellite_nb_;
+    gps_fix.status.satellites_used = satellite_used_;
     gps_fix_publisher_->publish(gps_fix);
     publishNavFixMsg(gps_fix);
-  } else if (header.message_type == MessageType::ROS_IMU) {
-    auto &contents = *reinterpret_cast<const IMUMessage *>(payload);
+  } else if (header.message_type == MessageType::IMU_OUTPUT) {
+    auto &contents = *reinterpret_cast<
+	const point_one::fusion_engine::messages::IMUOutput*>(payload); 	
     sensor_msgs::msg::Imu imu = ConversionUtils::toImu(contents);
     imu.header.frame_id = frame_id_;
     imu.header.stamp = time;
+
+    std::copy(std::begin(ros_imu_.orientation_covariance),
+              std::end(ros_imu_.orientation_covariance),
+              std::begin(imu.orientation_covariance));
+
+    std::copy(std::begin(ros_imu_.angular_velocity_covariance),
+              std::end(ros_imu_.angular_velocity_covariance),
+              std::begin(imu.angular_velocity_covariance));
+
+    std::copy(std::begin(ros_imu_.acceleration_covariance),
+              std::end(ros_imu_.acceleration_covariance),
+              std::begin(imu.linear_acceleration_covariance)); 
     imu_publisher_->publish(imu);
-  } else if (header.message_type == MessageType::ROS_POSE) {
+  } else if (header.message_type == MessageType::ROS_IMU)  {
+    ros_imu_ = *reinterpret_cast<
+	    const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
+     
+    /* Per the ROS IMU message specification:
+      * - If the a value is known but its covariance is not, its covariance matrix
+      *   will be set to 0.0
+      * - If a value is not known or not available, its covariance matrix will be set
+      *   to -1.0
+      *   - The value itself will be set to `NAN`, as this is not specified in the
+      *   ROS message definition
+      */
+    auto sanitize_cov = [](double (&cov)[9]) {
+	    std::replace_if(std::begin(cov), std::end(cov),
+                  [](double v){ return std::isnan(v); },
+                  -1.0);
+    };
+    sanitize_cov(ros_imu_.orientation_covariance);
+    sanitize_cov(ros_imu_.angular_velocity_covariance);
+    sanitize_cov(ros_imu_.acceleration_covariance);
+  } else if (header.message_type == MessageType::ROS_POSE) {	  
     auto &contents = *reinterpret_cast<
         const point_one::fusion_engine::messages::ros::PoseMessage *>(payload);
     geometry_msgs::msg::PoseStamped pos = ConversionUtils::toPose(contents);
@@ -94,7 +130,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     pos.header.frame_id = frame_id_;
     pos.header.stamp = time;
     pose_publisher_->publish(pos);
-    points.header.frame_id = "/p1_frame";
+    points.header.frame_id = frame_id_;
     points.header.stamp = this->now();
     points.ns = "basic_shapes";
     points.action = visualization_msgs::msg::Marker::ADD;
@@ -146,6 +182,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
   } else if (header.message_type == MessageType::GNSS_INFO) {
     auto &contents = *reinterpret_cast<
         const point_one::fusion_engine::messages::GNSSInfoMessage *>(payload);
+    satellite_used_ = contents.num_svs;
     if (this->get_parameter("debug").as_bool())
       RCLCPP_INFO(this->get_logger(), "Corrections age received (%d)",
                   contents.corrections_age);
