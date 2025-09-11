@@ -34,9 +34,7 @@ class ConversionUtils {
     gps_fix.pitch = contents.pitch_deg;
     gps_fix.roll = contents.roll_deg;
     gps_fix.dip = contents.dip_deg;
-    gps_fix.time =
-        0;  // contents.p1_time.seconds + (contents.p1_time.fraction_ns * 1e-9);
-            // // time since power-on
+   // gps_fix.time =  contents.p1_time.seconds + (contents.p1_time.fraction_ns * 1e-9); // time since power-on
     gps_fix.gdop = contents.gdop;
     gps_fix.hdop = contents.hdop;
     gps_fix.vdop = contents.vdop;
@@ -63,27 +61,33 @@ class ConversionUtils {
    * @return ROS standard message - Imu;
    */
   static sensor_msgs::msg::Imu toImu(
-      const point_one::fusion_engine::messages::ros::IMUMessage& contents) {
+      const point_one::fusion_engine::messages::IMUOutput& contents) {
     sensor_msgs::msg::Imu imu;
-    imu.orientation.x = contents.orientation[0];
+    /*imu.orientation.x = contents.orientation[0];
     imu.orientation.y = contents.orientation[1];
     imu.orientation.z = contents.orientation[2];
     imu.orientation.w = contents.orientation[3];
+
     std::copy(std::begin(contents.orientation_covariance),
               std::end(contents.orientation_covariance),
               std::begin(imu.orientation_covariance));
-    imu.angular_velocity.x = contents.angular_velocity_rps[0];
-    imu.angular_velocity.y = contents.angular_velocity_rps[1];
-    imu.angular_velocity.z = contents.angular_velocity_rps[2];
-    std::copy(std::begin(contents.angular_velocity_rps),
-              std::end(contents.angular_velocity_rps),
+	      */
+    imu.angular_velocity.x = contents.gyro_rps[0];
+    imu.angular_velocity.y = contents.gyro_rps[1];
+    imu.angular_velocity.z = contents.gyro_rps[2];
+    /*
+    std::copy(std::begin(contents.angular_velocity_covariance),
+              std::end(contents.angular_velocity_covariance),
               std::begin(imu.angular_velocity_covariance));
-    imu.linear_acceleration.x = contents.acceleration_mps2[0];
-    imu.linear_acceleration.y = contents.acceleration_mps2[1];
-    imu.linear_acceleration.z = contents.acceleration_mps2[2];
+	      */
+    imu.linear_acceleration.x = contents.accel_mps2[0];
+    imu.linear_acceleration.y = contents.accel_mps2[1];
+    imu.linear_acceleration.z = contents.accel_mps2[2];
+    /*
     std::copy(std::begin(contents.acceleration_covariance),
               std::end(contents.acceleration_covariance),
               std::begin(imu.linear_acceleration_covariance));
+	      */
     return imu;
   }
 

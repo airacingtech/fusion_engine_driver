@@ -17,7 +17,7 @@ set(P1_FE_BUILD_EXAMPLES OFF)
 include(FetchContent)
 FetchContent_Declare(
     fusion_engine_client
-    GIT_REPOSITORY https://github.com/PointOneNav/fusion-engine-client.git
+    GIT_REPOSITORY git@github.com:airacingtech/fusion-engine-client.git
     GIT_TAG origin/master
 )
 FetchContent_Populate(fusion_engine_client)

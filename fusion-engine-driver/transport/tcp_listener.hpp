@@ -44,7 +44,6 @@ class TcpListener : public DataListener {
    * @brief Listens for incoming data.
    */
   void listen();
-
   /**
    * @brief Writes data to the TCP connection.
    *

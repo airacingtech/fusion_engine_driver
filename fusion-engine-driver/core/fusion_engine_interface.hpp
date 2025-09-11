@@ -19,6 +19,13 @@ using namespace point_one::fusion_engine::messages;
 using namespace point_one::fusion_engine::messages::ros;
 
 /**
+ * For payload information and byte ordering, please reference:
+ * https://pointonenav.com/wp-content/uploads/2025/08/FusionEngine-Message-Specification-0.23.pdf
+ * 
+ * As of 9/1/2025, ROS_IMU payload outputs garbage.
+*/
+
+/**
  * @brief Reads bit stream from the Point One Nav Atlas and notifies all event
  * listeners attached to this object once a complete message has
  * been received according to the good type of reveiver manage in this
@@ -63,6 +70,11 @@ class FusionEngineInterface {
    * @param payload_in Message received.
    */
   void messageReceived(const MessageHeader& header, const void* payload_in);
+
+  /**
+   * Helper function for dumping raw tcp hex values
+   */
+  void dumpHex(const MessageHeader& header, const uint8_t* payload);
 
   /**
    * @brief Call fusion engine decoder.

@@ -117,11 +117,22 @@ class FusionEngineNode : public rclcpp::Node {
    * callbacks.
    */
   rclcpp::TimerBase::SharedPtr timer_;
+  /**
+   * @brief Number of satellite used for GNSS.
+   */
+
+  uint8_t satellite_used_;
 
   /**
    * @brief Number of satellite used for create nmea message.
    */
   uint16_t satellite_nb_;
+
+  /**
+   * @brief ROS wrapper for IMU message.
+   * As of 09/01/2025, we are only using this to extract the covariance
+   */
+  IMUMessage ros_imu_;
 
   /**
    * @brief Id of the frame send in ros.
