@@ -34,14 +34,16 @@ class ConversionUtils {
     gps_fix.pitch = contents.pitch_deg;
     gps_fix.roll = contents.roll_deg;
     gps_fix.dip = contents.dip_deg;
-   // gps_fix.time =  contents.p1_time.seconds + (contents.p1_time.fraction_ns * 1e-9); // time since power-on
+    gps_fix.time =  contents.p1_time.seconds
     gps_fix.gdop = contents.gdop;
+    gps_fix.pdop = contents.pdop;
     gps_fix.hdop = contents.hdop;
     gps_fix.vdop = contents.vdop;
     gps_fix.tdop = contents.tdop;
     gps_fix.err = contents.err_3d_m;
     gps_fix.err_horz = contents.err_horiz_m;
     gps_fix.err_vert = contents.err_vert_m;
+    gps_fix.err_track = contents.err_track_deg;
     gps_fix.err_speed = contents.err_speed_mps;
     gps_fix.err_climb = contents.err_climb_mps;
     gps_fix.err_time = contents.err_time_sec;
@@ -63,7 +65,7 @@ class ConversionUtils {
   static sensor_msgs::msg::Imu toImu(
       const point_one::fusion_engine::messages::IMUOutput& contents) {
     sensor_msgs::msg::Imu imu;
-    /*imu.orientation.x = contents.orientation[0];
+    imu.orientation.x = contents.orientation[0];
     imu.orientation.y = contents.orientation[1];
     imu.orientation.z = contents.orientation[2];
     imu.orientation.w = contents.orientation[3];
@@ -71,23 +73,22 @@ class ConversionUtils {
     std::copy(std::begin(contents.orientation_covariance),
               std::end(contents.orientation_covariance),
               std::begin(imu.orientation_covariance));
-	      */
+
     imu.angular_velocity.x = contents.gyro_rps[0];
     imu.angular_velocity.y = contents.gyro_rps[1];
     imu.angular_velocity.z = contents.gyro_rps[2];
-    /*
+    
     std::copy(std::begin(contents.angular_velocity_covariance),
               std::end(contents.angular_velocity_covariance),
               std::begin(imu.angular_velocity_covariance));
-	      */
+
     imu.linear_acceleration.x = contents.accel_mps2[0];
     imu.linear_acceleration.y = contents.accel_mps2[1];
     imu.linear_acceleration.z = contents.accel_mps2[2];
-    /*
+
     std::copy(std::begin(contents.acceleration_covariance),
               std::end(contents.acceleration_covariance),
               std::begin(imu.linear_acceleration_covariance));
-	      */
     return imu;
   }
 

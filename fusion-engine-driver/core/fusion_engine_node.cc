@@ -176,6 +176,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::POSE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage *>(payload);
+        kFactory().at(type)(this, &contents);
       break;
       }
     case MessageType::GNSS_INFO:
@@ -267,9 +268,19 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::ROS_GPS_FIX:
       {
         auto &contents = *reinterpret_cast<const GPSFixMessage *>(payload);
+        gps_msgs::msg::GPSFix gps_fix = ConversionUtils::toGPSFix(contents);
+        gps_fix.header.frame_id = frame_id_;
+        gps_fix.header.stamp = time;
+        kFactory().at(type)(this, &gps_fix);
       break;
       }
     case MessageType::ROS_IMU:
+      {
+        auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
+        sensor_msgs::msg::Imu imu = ConversionUtils::toImu(contents);
+        imu.header.frame_id = frame_id_;
+        imu.header.stamp = time;
+        kFactory().at(type)(this, &imu);
       {
       break;
       }
