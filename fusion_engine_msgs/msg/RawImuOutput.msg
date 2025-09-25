@@ -1,4 +1,4 @@
 std_msgs/Header header
-int16 temperature
-int32[3] accel
-int32[3] gyro
+float64 temperature
+float64[3] accel
+float64[3] gyro

@@ -118,12 +118,13 @@ class ConversionUtils {
     msg.position_std_enu_m.x = contents.position_std_enu_m[0]; msg.position_std_enu_m.y = contents.position_std_enu_m[1]; msg.position_std_enu_m.z = contents.position_std_enu_m[2];
     return msg;
   }
-
-
+  
   static fusion_engine_msgs::msg::RawWheelSpeedOutput populate(const point_one::fusion_engine::messages::RawWheelSpeedOutput& contents) {
     fusion_engine_msgs::msg::RawWheelSpeedOutput msg;
-    msg.front_left_speed  = contents.front_left_speed; msg.front_right_speed = contents.front_right_speed;
-    msg.rear_left_speed   = contents.rear_left_speed;   msg.rear_right_speed  = contents.rear_right_speed;
+    msg.front_left_speed  = (contents.front_left_speed  == INT32_MAX) ? NAN : contents.front_left_speed  / 1024.0;
+    msg.front_right_speed = (contents.front_right_speed == INT32_MAX) ? NAN : contents.front_right_speed / 1024.0;
+    msg.rear_left_speed   = (contents.rear_left_speed   == INT32_MAX) ? NAN : contents.rear_left_speed   / 1024.0;
+    msg.rear_right_speed  = (contents.rear_right_speed  == INT32_MAX) ? NAN : contents.rear_right_speed  / 1024.0;
     msg.gear = static_cast<int>(contents.gear);
     return msg;
   }
