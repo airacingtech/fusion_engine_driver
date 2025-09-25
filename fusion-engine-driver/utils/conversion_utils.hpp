@@ -27,55 +27,55 @@ class ConversionUtils {
     return msg;
   }
 
-  static gps_msgs::msg::GPSFix populate(const point_one::fusion_engine::messages::ros::GPSFixMessage& contents) {
-    gps_msgs::msg::GPSFix msg;
-    msg.latitude  = contents.latitude_deg;    msg.longitude = contents.longitude_deg;
-    msg.altitude  = contents.altitude_m;      msg.track     = contents.track_deg;
-    msg.speed     = contents.speed_mps;       msg.climb     = contents.climb_mps;
-    msg.pitch     = contents.pitch_deg;       msg.roll      = contents.roll_deg;       msg.dip = contents.dip_deg;
+  // static gps_msgs::msg::GPSFix populate(const point_one::fusion_engine::messages::ros::GPSFixMessage& contents) {
+  //   gps_msgs::msg::GPSFix msg;
+  //   msg.latitude  = contents.latitude_deg;    msg.longitude = contents.longitude_deg;
+  //   msg.altitude  = contents.altitude_m;      msg.track     = contents.track_deg;
+  //   msg.speed     = contents.speed_mps;       msg.climb     = contents.climb_mps;
+  //   msg.pitch     = contents.pitch_deg;       msg.roll      = contents.roll_deg;       msg.dip = contents.dip_deg;
 
-    msg.time      = contents.p1_time.seconds;
+  //   msg.time      = contents.p1_time.seconds;
     
-    msg.gdop      = contents.gdop;           msg.pdop      = contents.pdop;           msg.hdop = contents.hdop;
-    msg.vdop      = contents.vdop;           msg.tdop      = contents.tdop;
+  //   msg.gdop      = contents.gdop;           msg.pdop      = contents.pdop;           msg.hdop = contents.hdop;
+  //   msg.vdop      = contents.vdop;           msg.tdop      = contents.tdop;
 
-    msg.err       = contents.err_3d_m;       msg.err_horz  = contents.err_horiz_m;    msg.err_vert  = contents.err_vert_m;
-    msg.err_track = contents.err_track_deg;  msg.err_speed = contents.err_speed_mps;  msg.err_climb = contents.err_climb_mps;
-    msg.err_pitch = contents.err_pitch_deg;  msg.err_roll  = contents.err_roll_deg;   msg.err_dip   = contents.err_dip_deg;
-    msg.err_time  = contents.err_time_sec;
-    std::copy(std::begin(contents.position_covariance_m2),
-              std::end(contents.position_covariance_m2),
-              std::begin(msg.position_covariance));
-    msg.position_covariance_type = contents.position_covariance_type;
-    return msg;
-  }
+  //   msg.err       = contents.err_3d_m;       msg.err_horz  = contents.err_horiz_m;    msg.err_vert  = contents.err_vert_m;
+  //   msg.err_track = contents.err_track_deg;  msg.err_speed = contents.err_speed_mps;  msg.err_climb = contents.err_climb_mps;
+  //   msg.err_pitch = contents.err_pitch_deg;  msg.err_roll  = contents.err_roll_deg;   msg.err_dip   = contents.err_dip_deg;
+  //   msg.err_time  = contents.err_time_sec;
+  //   std::copy(std::begin(contents.position_covariance_m2),
+  //             std::end(contents.position_covariance_m2),
+  //             std::begin(msg.position_covariance));
+  //   msg.position_covariance_type = contents.position_covariance_type;
+  //   return msg;
+  // }
 
-  static sensor_msgs::msg::Imu populate(const point_one::fusion_engine::messages::ros::IMUMessage& contents) {
-    sensor_msgs::msg::Imu msg;
-    msg.orientation.x = contents.orientation[0]; msg.orientation.y = contents.orientation[1];
-    msg.orientation.z = contents.orientation[2]; msg.orientation.w = contents.orientation[3];
+  // static sensor_msgs::msg::Imu populate(const point_one::fusion_engine::messages::ros::IMUMessage& contents) {
+  //   sensor_msgs::msg::Imu msg;
+  //   msg.orientation.x = contents.orientation[0]; msg.orientation.y = contents.orientation[1];
+  //   msg.orientation.z = contents.orientation[2]; msg.orientation.w = contents.orientation[3];
 
-    std::copy(std::begin(contents.orientation_covariance),
-              std::end(contents.orientation_covariance),
-              std::begin(msg.orientation_covariance));
+  //   std::copy(std::begin(contents.orientation_covariance),
+  //             std::end(contents.orientation_covariance),
+  //             std::begin(msg.orientation_covariance));
 
-    msg.angular_velocity.x = contents.angular_velocity_rps[0];
-    msg.angular_velocity.y = contents.angular_velocity_rps[1];
-    msg.angular_velocity.z = contents.angular_velocity_rps[2];
+  //   msg.angular_velocity.x = contents.angular_velocity_rps[0];
+  //   msg.angular_velocity.y = contents.angular_velocity_rps[1];
+  //   msg.angular_velocity.z = contents.angular_velocity_rps[2];
 
-    std::copy(std::begin(contents.angular_velocity_covariance),
-              std::end(contents.angular_velocity_covariance),
-              std::begin(msg.angular_velocity_covariance));
+  //   std::copy(std::begin(contents.angular_velocity_covariance),
+  //             std::end(contents.angular_velocity_covariance),
+  //             std::begin(msg.angular_velocity_covariance));
 
-    msg.linear_acceleration.x = contents.acceleration_mps2[0];
-    msg.linear_acceleration.y = contents.acceleration_mps2[1];
-    msg.linear_acceleration.z = contents.acceleration_mps2[2];
+  //   msg.linear_acceleration.x = contents.acceleration_mps2[0];
+  //   msg.linear_acceleration.y = contents.acceleration_mps2[1];
+  //   msg.linear_acceleration.z = contents.acceleration_mps2[2];
 
-    std::copy(std::begin(contents.acceleration_covariance),
-              std::end(contents.acceleration_covariance),
-              std::begin(msg.linear_acceleration_covariance));
-    return msg;
-  }
+  //   std::copy(std::begin(contents.acceleration_covariance),
+  //             std::end(contents.acceleration_covariance),
+  //             std::begin(msg.linear_acceleration_covariance));
+  //   return msg;
+  // }
 
   /**
    * @brief Calculate the XOR checksum of a string message.
