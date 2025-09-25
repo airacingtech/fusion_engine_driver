@@ -47,37 +47,24 @@ class FusionEngineNode : public rclcpp::Node {
    *
    */
   FusionEngineInterface fe_interface_;
-  
+
   /**
-   * @brief Publishers for Navigation Messages
+   * @brief
+   * Publishers for Navigation Messages
    * Pose (10000)
    * GNSSInfo (10001)
    * GNSSSatellite (10002)
    * PoseAux (10003)
    * CalibrationStatus (10004)
    * RelativeENUPosition (10005)
-   */
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr filtered_pose_pub_;
-/*  rclcpp::Publisher<>::SharedPtr gnss_info_pub_;
-  rclcpp::Publisher<>::SharedPtr gnss_satellite_pub_;
-  rclcpp::Publisher<>::SharedPtr pose_aux_pub_;
-  rclcpp::Publisher<>::SharedPtr calibration_pub_;
-  rclcpp::Publisher<>::SharedPtr relative_enu_pub_;
-*/
-  /**
-   * @brief Publishers for Calibrated Messages
+   * 
+   * Publishers for Calibrated Messages
    * IMUOutput (11000)
-   * GNSSAttitudeOutput (11005)
+   * GNSSAttitudeOutput (11001)
    * WheelSpeedOutput (11135)
    * VehicleSpeedOutput (11136)
-   */
-  /*rclcpp::Publisher<>::SharedPtr calibrated_imu_pub_;
-  rclcpp::Publisher<>::SharedPtr calibrated_gnss_pub_;
-  rclcpp::Publisher<>::SharedPtr calibrated_ws_pub_;
-  rclcpp::Publisher<>::SharedPtr calibrated_ws_pub_;
-*/
-  /**
-   * @brief Publishers for Raw Messages
+   * 
+   * Publishers for Raw Messages
    * RawIMUOutput (11002)
    * RawGNSSAttitudeOutput (11006)
    * RawWheelTickOutput (11123)
@@ -85,25 +72,13 @@ class FusionEngineNode : public rclcpp::Node {
    * RawWheelSpeedOutput (11125)
    * RawVehicleSpeedOutput (11126)
    * InputDataWrapper (13120)
-   */
-  /*rclcpp::Publisher<>::SharedPtr raw_imu_pub_;
-  rclcpp::Publisher<>::SharedPtr raw_gnss_pub_;
-  rclcpp::Publisher<>::SharedPtr raw_wt_pub_;
-  rclcpp::Publisher<>::SharedPtr raw_vt_pub_;
-  rclcpp::Publisher<>::SharedPtr raw_ws_pub_;
-  rclcpp::Publisher<>::SharedPtr raw_vs_pub_;
-  rclcpp::Publisher<>::SharedPtr binary_pub_;
-*/
-  /**
-   * @brief Publishers for ROS Messages
+   *
+   * Publishers for ROS Messages
    * ROSPose (12000)
    * ROSGPSFix (12010)
    * ROSIMUMessage (12011)
    */
-  /*rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr ros_pose_pub_;
-  rclcpp::Publisher<gps_msgs::msg::GPSFix>::SharedPtr ros_gpsfix_pub_;
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr ros_imu_pub_;
-*/
+
   /**
    * @brief Smart pointer to a ROS 2 publisher for NavSatFix data.
    *
@@ -112,16 +87,6 @@ class FusionEngineNode : public rclcpp::Node {
    * the `rclcpp::Publisher<sensor_msgs::msg::NavSatFix>` type.
    */
   rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr nav_fix_publisher_;
-
-  /**
-   * @brief Smart pointer to a ROS 2 publisher for marker data.
-   *
-   * This smart pointer provides access to a ROS 2 publisher, which is used to
-   * publish marker data on topic /visualization_marker. The publisher is
-   * represented by the `rclcpp::Publisher<visualization_msgs::msg::Marker>`
-   * type.
-   */
-  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr vis_publisher_;
 
   /**
    * @brief Smart pointer to a ROS 2 publisher for NMEA sentence data.
@@ -150,19 +115,9 @@ class FusionEngineNode : public rclcpp::Node {
   rclcpp::TimerBase::SharedPtr timer_;
   
   /**
-   * @brief Number of satellite used for create nmea message.
-   */
-  uint16_t satellite_nb_;
-
-  /**
    * @brief Id of the frame send in ros.
    */
   std::string frame_id_;
-
-  /**
-   * @brief Number of each marker send in ros.
-   */
-  int id = 0;
 
   /**
    * @brief Thread used for get data from the receiver.
