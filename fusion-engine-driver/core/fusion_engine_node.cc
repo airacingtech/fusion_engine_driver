@@ -17,7 +17,23 @@ FusionEngineNode::FusionEngineNode()
   timer_ =
       create_wall_timer(std::chrono::milliseconds(1),
                         std::bind(&FusionEngineNode::rosServiceLoop, this));
-  pose_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
+
+  // Navigation Outputs
+ /* pose_filtered_publisher_ = this->create_publisher<>("", rclcpp::SensorDataQoS());
+  pose_aux_publisher = this->create_publisher<>("", rclcpp::SensorDataQoS());
+  calibration_publisher = this->create_publisher<>("", rclcpp::SensorDataQoS());
+  gnss_info_publisher = this->create_publisher<>("", rclcpp::SensorDataQoS());
+  gnss_satellite_publisher = this->create_publisher<>("", rclcpp::SensorDataQoS());
+  relative_enu_publisher = this->creat
+*/
+  // Calibrated Outputs
+
+
+  // Raw Sensor Outputs
+
+
+  // ROS Outputs
+ /* pose_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
       "pose", rclcpp::SensorDataQoS());
   gps_fix_publisher_ = this->create_publisher<gps_msgs::msg::GPSFix>(
       "gps_fix", rclcpp::SensorDataQoS());
@@ -25,8 +41,10 @@ FusionEngineNode::FusionEngineNode()
       "fix", rclcpp::SensorDataQoS());
   imu_publisher_ = this->create_publisher<sensor_msgs::msg::Imu>(
       "imu", rclcpp::SensorDataQoS());
-  publisher_ = this->create_publisher<visualization_msgs::msg::Marker>(
+
+  vis_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>(
       "visualization_marker", 1);
+      */
   timer_ =
       create_wall_timer(std::chrono::milliseconds(1),
                         std::bind(&FusionEngineNode::rosServiceLoop, this));
@@ -70,17 +88,25 @@ FusionEngineNode::~FusionEngineNode() {
 }
 
 /******************************************************************************/
+using Factory = std::function<rclcpp::PublisherBase::SharedPtr(FusionEngineNode*)>;
+static const std::unordered_map<MessageType, Factory>& kFactory() {
+	static const std::unordered_map<MessageType, Factory> kTable = {
+		{MessageType::POSE, [](FusionEngineNode* n) { return n->create_publisher<geometry_msgs::msg::PoseStamped>("pose_filtered", rclcpp::SensorDataQoS());}},
+          }
+          return kTable;
+};
+/******************************************************************************/
 void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
                                                    const void *payload) {
   auto time = now();
-
+  auto type = header.message_type;
+  /*
   if (header.message_type == MessageType::ROS_GPS_FIX) {
     auto &contents = *reinterpret_cast<const GPSFixMessage *>(payload);
     gps_msgs::msg::GPSFix gps_fix = ConversionUtils::toGPSFix(contents);
     gps_fix.header.frame_id = frame_id_;
     gps_fix.header.stamp = time;
     gps_fix.status.satellites_visible = satellite_nb_;
-    gps_fix.status.satellites_used = satellite_used_;
     gps_fix_publisher_->publish(gps_fix);
     publishNavFixMsg(gps_fix);
   } else if (header.message_type == MessageType::IMU_OUTPUT) {
@@ -90,7 +116,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     imu.header.frame_id = frame_id_;
     imu.header.stamp = time;
 
-    std::copy(std::begin(ros_imu_.orientation_covariance),
+  /*  std::copy(std::begin(ros_imu_.orientation_covariance),
               std::end(ros_imu_.orientation_covariance),
               std::begin(imu.orientation_covariance));
 
@@ -101,10 +127,11 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     std::copy(std::begin(ros_imu_.acceleration_covariance),
               std::end(ros_imu_.acceleration_covariance),
               std::begin(imu.linear_acceleration_covariance)); 
+	      
     imu_publisher_->publish(imu);
   } else if (header.message_type == MessageType::ROS_IMU)  {
-    ros_imu_ = *reinterpret_cast<
-	    const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
+//    ros_imu_ = *reinterpret_cast<
+//	    const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
   } else if (header.message_type == MessageType::ROS_POSE) {	  
     auto &contents = *reinterpret_cast<
         const point_one::fusion_engine::messages::ros::PoseMessage *>(payload);
@@ -157,22 +184,79 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
       previous_gps_time_sec_ = gps_time_sec;
       nmea_publisher_->publish(nmea);
     }
-  } else if (header.message_type == MessageType::GNSS_SATELLITE) {
-    auto &contents = *reinterpret_cast<
-        const point_one::fusion_engine::messages::GNSSSatelliteMessage *>(
-        payload);
-    satellite_nb_ = contents.num_satellites;
-  } else if (header.message_type == MessageType::GNSS_INFO) {
-    auto &contents = *reinterpret_cast<
-        const point_one::fusion_engine::messages::GNSSInfoMessage *>(payload);
-    satellite_used_ = contents.num_svs;
-    if (this->get_parameter("debug").as_bool())
-      RCLCPP_INFO(this->get_logger(), "Corrections age received (%d)",
-                  contents.corrections_age);
   }
+  }
+  */
 }
 
 /******************************************************************************/
+void FusionEngineNode::init(const MessageType type){
+	if (!publishers_.count(type)) {
+		auto it = kFactory().find(type);
+		if (it != kFactory().end()) {
+			publishers_[type] = it->second(this);
+		}
+	}
+}
+
+/*
+	switch(type){
+		// Navigation
+		case MessageType::POSE:
+			filtered_pose_pub_ = filtered_pose_pub_ ?
+					    filtered_pose_pub_ :
+					    this->create_publisher<geometry_msgs::msg::PoseStamped>("pose_filtered", rclcpp::SensorDataQoS());
+			break;
+		case MessageType::GNSS_INFO:
+			gnss_info_pub_ = gnss_info_pub_ ?
+					 gnss_info_pub_ :
+					 this->create_publisher<>("gnss_info", rclcpp:SensorDataQoS());
+			break;
+		case MessageType::GNSS_SATELLITE:
+			gnss_satellite_pub_ = gnss_satellite_pub_ ?
+					      gnss_satellite_pub_ :
+					      this->create_publisher<>("gnss_satellite", rclcpp:SensorDataQoS());
+			break;
+		case MessageType::POSE_AUX:
+			pose_aux_pub_ = pose_aux_pub_ ?
+					pose_aux_pub_ :
+					this->create_publisher<>("pose_aux", rclcppSensorDataQoS());
+			break;
+		case MessageType::CALIBRATION_STATUS:
+			calibration_pub_ = calibration_pub_ ?
+					   calibration_pub_ :
+					   this->create_publisher<>("calibration_status", rclcppSensorDataQoS());
+			break;
+		case MessageType::RELATIVE_ENU_POSITION:
+			relative_enu_pub_ = relative_enu_pub_ ?
+					    relative_enu_pub_ :
+					    this->create_publisher<>("relative_enu_position", rclcppSensorDataQoS());
+			break;
+		// Calibrated
+		case MessageType::IMU_OUTPUT:
+		case MessageType::GNSS_ATTITUDE_OUTPUT:
+		case MessageType::WHEEL_SPEED_OUTPUT:
+		case MessageType::VEHICLE_SPEED_OUTPUT:
+		
+		// Raw
+		case MessageType::RAW_IMU_OUTPUT:
+		case MessageType::RAW_GNSS_ATTITUDE_OUTPUT:
+		case MessageType::RAW_WHEEL_TICK_OUTPUT:
+		case MessageType::RAW_VEHICLE_TICK_OUTPUT:
+		case MessageType::RAW_WHEEL_SPEED_OUTPUT:
+		case MessageType::RAW_VEHICLE_SPEED_OUTPUT:
+
+		// ROS
+		case MessageType::ROS_POSE:
+		case MessageType::ROS_GPS_FIX:
+		case MessageType::ROS_IMU:
+		default:
+			break;
+	}
+}
+
+*/
+/*****************************************************************************/
 void FusionEngineNode::publishNavFixMsg(const gps_msgs::msg::GPSFix &gps_fix) {
   sensor_msgs::msg::NavSatFix fix;
   fix.header = gps_fix.header;

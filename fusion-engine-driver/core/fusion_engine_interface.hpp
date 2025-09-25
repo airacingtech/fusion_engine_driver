@@ -17,7 +17,6 @@
 
 using namespace point_one::fusion_engine::messages;
 using namespace point_one::fusion_engine::messages::ros;
-
 /**
  * For payload information and byte ordering, please reference:
  * https://pointonenav.com/wp-content/uploads/2025/08/FusionEngine-Message-Specification-0.23.pdf
@@ -74,7 +73,7 @@ class FusionEngineInterface {
   /**
    * Helper function for dumping raw tcp hex values
    */
-  void dumpHex(const MessageHeader& header, const uint8_t* payload);
+  void dumpHex(const MessageHeader& header, const uint8_t* payload, MessageType type);
 
   /**
    * @brief Call fusion engine decoder.

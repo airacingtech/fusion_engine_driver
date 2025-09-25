@@ -38,15 +38,17 @@ void FusionEngineInterface::initialize(rclcpp::Node* node,
 /******************************************************************************/
 void FusionEngineInterface::messageReceived(const MessageHeader& header,
                                             const void* payload_in) {
+  //dumpHex(header, payload, MessageType::GNSS_INFO);
   auto payload = static_cast<const uint8_t*>(payload_in);
-  //dumpHex(header, payload);
+  MessageType type = header.message_type;
+  init(type);
   publisher(header, payload);
 }
 
 /******************************************************************************/
-void FusionEngineInterface::dumpHex(const MessageHeader& header, const uint8_t* payload) {
-	if (header.message_type == MessageType::ROS_IMU) {
-		printf("[ROS_IMU] Payload (%u bytes):\n", header.payload_size_bytes);
+void FusionEngineInterface::dumpHex(const MessageHeader& header, const uint8_t* payload, MessageType type) {
+	if (header.message_type == type) {
+		printf("%s Payload (%u bytes):\n", to_string(header.message_type), header.payload_size_bytes);
 		for (uint32_t i = 0; i < header.payload_size_bytes; i++) {
 			printf("%02X ", payload[i]);
 			if ((i + 1) % 8 == 0) printf("\n");  // 8 Bytes, according to PON Manual.
