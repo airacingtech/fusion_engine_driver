@@ -171,6 +171,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
                                                    const void *payload) {
   auto time = now();
   auto type = header.message_type;
+  std::cout << to_string(type) << "\n";
   switch(type) {
     // Navigation Solutions
     case MessageType::POSE:
