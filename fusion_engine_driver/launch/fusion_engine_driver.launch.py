@@ -4,7 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def generate_launch_description():
-    directory = get_package_share_directory('fusion-engine-driver')
+    directory = get_package_share_directory('fusion_engine_driver')
 
     param_file_path = os.path.join(
         directory,
@@ -13,7 +13,7 @@ def generate_launch_description():
     )
     
     fusion_node = Node(
-        package='fusion-engine-driver',
+        package='fusion_engine_driver',
         executable='fusion_engine_ros_driver',
 	name='fusion_engine_node',
         output='screen',
