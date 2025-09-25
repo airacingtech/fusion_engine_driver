@@ -88,19 +88,166 @@ FusionEngineNode::~FusionEngineNode() {
 }
 
 /******************************************************************************/
-using Factory = std::function<rclcpp::PublisherBase::SharedPtr(FusionEngineNode*)>;
+using Factory = std::function<void(FusionEngineNode*, const void* msg)>;
 static const std::unordered_map<MessageType, Factory>& kFactory() {
-	static const std::unordered_map<MessageType, Factory> kTable = {
-		{MessageType::POSE, [](FusionEngineNode* n) { return n->create_publisher<geometry_msgs::msg::PoseStamped>("pose_filtered", rclcpp::SensorDataQoS());}},
-          }
-          return kTable;
-};
+  static const std::unordered_map<MessageType, Factory> kTable = {
+    // Navigation Outputs
+    {MessageType::POSE, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
+      "pose_filtered", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+    }},
+    {MessageType::GNSS_INFO, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<gps_msgs::msg::GPSStatus>(
+      "gnss_info", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const gps_msgs::msg::GPSStatus*>(msg));
+    }},
+    {MessageType::GNSS_SATELLITE, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<gps_msgs::msg::GPSStatus>(
+      "gnss_satellite", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const gps_msgs::msg::GPSStatus*>(msg));
+    }},
+    {MessageType::POSE_AUX, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
+      "pose_aux", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+    }},
+    {MessageType::CALIBRATION_STATUS, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<std_msgs::msg::String>(
+      "calibration_status", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+    }},
+    {MessageType::RELATIVE_ENU_POSITION, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
+      "relative_enu_position", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+    }},
+
+    // Calibrated Outputs
+    {MessageType::IMU_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
+      "imu_calibrated", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
+    }},
+    {MessageType::GNSS_ATTITUDE_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
+      "gnss_attitude", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+    }},
+    {MessageType::WHEEL_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<std_msgs::msg::String>(
+      "wheel_speed", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+    }},
+    {MessageType::VEHICLE_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<std_msgs::msg::String>(
+      "vehicle_speed", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+    }},
+
+    // Raw Outputs
+    {MessageType::RAW_IMU_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
+      "raw_imu", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
+    }},
+    {MessageType::RAW_GNSS_ATTITUDE_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
+      "raw_gnss_attitude", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+    }},
+    {MessageType::RAW_WHEEL_TICK_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<std_msgs::msg::String>(
+      "raw_wheel_tick", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+    }},
+    {MessageType::RAW_VEHICLE_TICK_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<std_msgs::msg::String>(
+      "raw_vehicle_tick", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+    }},
+    {MessageType::RAW_WHEEL_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<std_msgs::msg::String>(
+      "raw_wheel_speed", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+    }},
+    {MessageType::RAW_VEHICLE_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<std_msgs::msg::String>(
+      "raw_vehicle_speed", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+    }},
+
+    // ROS Outputs
+    {MessageType::ROS_POSE, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
+      "ros_pose", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+    }},
+    {MessageType::ROS_GPS_FIX, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<gps_msgs::msg::GPSFix>(
+      "ros_gpsfix", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const gps_msgs::msg::GPSFix*>(msg));
+    }},
+    {MessageType::ROS_IMU, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
+      "ros_imu", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
+    }},
+  };
+  return kTable;
+}
+
 /******************************************************************************/
 void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
                                                    const void *payload) {
   auto time = now();
   auto type = header.message_type;
-  /*
+  auto it = kFactory().find(type);
+  switch(type) {
+    case MessageType::POSE:
+      {
+        auto &contents = *reinterpret_cast<
+            const point_one::fusion_engine::messages::PoseMessage *>(payload);
+        geometry_msgs::msg::PoseStamped pos = ConversionUtils::toPose(contents);
+        visualization_msgs::msg::Marker points;
+        pos.header.frame_id = frame_id_;
+        pos.header.stamp = time;
+        kFactory().at(type)(this, &pos);
+        points.header.frame_id = frame_id_;
+        points.header.stamp = this->now();
+        points.ns = "basic_shapes";
+        points.action = visualization_msgs::msg::Marker::ADD;
+        points.pose.orientation.w = 1.0;
+        points.id = id;
+        points.type = visualization_msgs::msg::Marker::POINTS;
+        points.scale.x = 0.1;
+        points.scale.y = 0.1;
+        points.color.g = 1.0f;
+        points.color.a = 1.0;
+        geometry_msgs::msg::Point p;
+        p.x = pos.pose.position.x;
+        p.y = pos.pose.position.y;
+        p.z = pos.pose.position.z;
+
+        if (!std::isnan(p.x) && !std::isnan(p.y) && !std::isnan(p.z)) {
+          if (this->get_parameter("debug").as_bool())
+            RCLCPP_INFO(this->get_logger(), "Point published = [LLA=%f, %f, %f]",
+                        p.x, p.y, p.z);
+          points.points.push_back(p);
+          vis_publisher_->publish(points);
+          id++;
+
+        } else {
+          if (this->get_parameter("debug").as_bool())
+            RCLCPP_INFO(this->get_logger(), "Point dropped = [LLA=%f, %f, %f]", p.x,
+                        p.y, p.z);
+        }
+      }
+      break;
+    default:
+      break;
+  }
+      /*
   if (header.message_type == MessageType::ROS_GPS_FIX) {
     auto &contents = *reinterpret_cast<const GPSFixMessage *>(payload);
     gps_msgs::msg::GPSFix gps_fix = ConversionUtils::toGPSFix(contents);
@@ -190,15 +337,6 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
 }
 
 /******************************************************************************/
-void FusionEngineNode::init(const MessageType type){
-	if (!publishers_.count(type)) {
-		auto it = kFactory().find(type);
-		if (it != kFactory().end()) {
-			publishers_[type] = it->second(this);
-		}
-	}
-}
-
 /*
 	switch(type){
 		// Navigation

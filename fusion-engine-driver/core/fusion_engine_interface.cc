@@ -40,8 +40,6 @@ void FusionEngineInterface::messageReceived(const MessageHeader& header,
                                             const void* payload_in) {
   //dumpHex(header, payload, MessageType::GNSS_INFO);
   auto payload = static_cast<const uint8_t*>(payload_in);
-  MessageType type = header.message_type;
-  init(type);
   publisher(header, payload);
 }
 

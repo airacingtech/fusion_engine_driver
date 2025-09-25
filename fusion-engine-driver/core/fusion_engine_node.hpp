@@ -35,12 +35,6 @@ class FusionEngineNode : public rclcpp::Node {
                                    const void *payload);
 
   /**
-   * @brief Factory for building publishers, depending on what's incoming
-   * @param type MessageType
-  */
-   void init(const MessageType type); 
-
-  /**
    * Translate GPSFix to NavFixMsg
    * @param gps_fix Atlas gps data point.
    */
