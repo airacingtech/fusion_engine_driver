@@ -259,7 +259,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::ROS_POSE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::ros::PoseMessage *>(payload);
-        geometry_msgs::msg::PoseStamped pos = ConversionUtils::toPose(contents);
+        geometry_msgs::msg::PoseStamped pos = ConversionUtils::populate(contents);
         pos.header.frame_id = frame_id_;
         pos.header.stamp = time;
         kFactory().at(type)(this, &pos);
@@ -268,7 +268,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::ROS_GPS_FIX:
       {
         auto &contents = *reinterpret_cast<const GPSFixMessage *>(payload);
-        gps_msgs::msg::GPSFix gps_fix = ConversionUtils::toGPSFix(contents);
+        gps_msgs::msg::GPSFix gps_fix = ConversionUtils::populate(contents);
         gps_fix.header.frame_id = frame_id_;
         gps_fix.header.stamp = time;
         kFactory().at(type)(this, &gps_fix);
@@ -277,11 +277,10 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::ROS_IMU:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
-        sensor_msgs::msg::Imu imu = ConversionUtils::toImu(contents);
+        sensor_msgs::msg::Imu imu = ConversionUtils::populate(contents);
         imu.header.frame_id = frame_id_;
         imu.header.stamp = time;
         kFactory().at(type)(this, &imu);
-      {
       break;
       }
     default:
