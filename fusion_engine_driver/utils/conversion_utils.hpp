@@ -219,8 +219,8 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
   /***********************************************************************************************************/
   /* Calibrated Utils */
 
-  static fusion_engine_msgs::msg::ImuOutput populate(const point_one::fusion_engine::messages::IMUOutput& contents) {
-    fusion_engine_msgs::msg::ImuOutput msg;
+  static sensor_msgs::msg::Imu populate(const point_one::fusion_engine::messages::IMUOutput& contents) {
+    sensor_msgs::msg::Imu msg;
 
     msg.linear_acceleration.x = contents.accel_mps2[0];
     msg.linear_acceleration.y = contents.accel_mps2[1];
