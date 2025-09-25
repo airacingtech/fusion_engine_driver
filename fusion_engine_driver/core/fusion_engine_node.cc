@@ -231,7 +231,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::IMU_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::IMUOutput *>(payload);
-        fusion_engine_msgs::msg::ImuOutput msg = ConversionUtils::populate(contents);
+        sensor_msgs::msg::Imu msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
