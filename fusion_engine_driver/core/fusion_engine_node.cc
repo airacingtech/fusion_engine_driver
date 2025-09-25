@@ -60,36 +60,36 @@ FusionEngineNode::~FusionEngineNode() {
 using Factory = std::function<void(FusionEngineNode*, const void* msg)>;
 static const std::unordered_map<MessageType, Factory>& kFactory() {
   static const std::unordered_map<MessageType, Factory> kTable = {
-    // Navigation Outputs
+      // Navigation Outputs
     {MessageType::POSE, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
-      "pose_filtered", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::Pose>(
+        "pose_filtered", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::Pose*>(msg));
     }},
     {MessageType::POSE_AUX, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
-      "pose_aux", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::PoseAux>(
+        "pose_aux", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::PoseAux*>(msg));
     }},
     {MessageType::CALIBRATION_STATUS, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "calibration_status", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::CalibrationStatus>(
+        "calibration_status", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::CalibrationStatus*>(msg));
     }},
     {MessageType::GNSS_INFO, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<gps_msgs::msg::GPSStatus>(
-      "gnss_info", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const gps_msgs::msg::GPSStatus*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::GnssInfo>(
+        "gnss_info", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::GnssInfo*>(msg));
     }},
     {MessageType::GNSS_SATELLITE, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<gps_msgs::msg::GPSStatus>(
-      "gnss_satellite", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const gps_msgs::msg::GPSStatus*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::GnssSatellite>(
+        "gnss_satellite", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::GnssSatellite*>(msg));
     }},
     {MessageType::RELATIVE_ENU_POSITION, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
-      "relative_enu_position", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RelativeEnuPosition>(
+        "relative_enu_position", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RelativeEnuPosition*>(msg));
     }},
 
     // Calibrated Outputs
@@ -177,37 +177,55 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::POSE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::Pose msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::GNSS_INFO:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::GNSSInfoMessage *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::GnssInfo msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::GNSS_SATELLITE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::GNSSSatelliteMessage *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::GnssSatellite msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::POSE_AUX:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseAuxMessage *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::PoseAux msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::CALIBRATION_STATUS:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::CalibrationStatusMessage *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::CalibrationStatus msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::RELATIVE_ENU_POSITION:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RelativeENUPositionMessage *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::RelativeEnuPosition msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     // Calibrated Sensors

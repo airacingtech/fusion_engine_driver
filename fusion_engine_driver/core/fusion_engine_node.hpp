@@ -20,6 +20,13 @@
 #include "nmea_msgs/msg/sentence.hpp"
 
 #include "fusion_engine_interface.hpp"
+#include "fusion_engine_msgs/msg/pose.hpp"
+#include "fusion_engine_msgs/msg/pose_aux.hpp"
+#include "fusion_engine_msgs/msg/calibration_status.hpp"
+#include "fusion_engine_msgs/msg/relative_enu_position.hpp"
+#include "fusion_engine_msgs/msg/gnss_info.hpp"
+#include "fusion_engine_msgs/msg/gnss_satellite.hpp"
+#include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
 #include "fusion_engine_msgs/msg/imu_output.hpp"
 #include "fusion_engine_msgs/msg/gnss_attitude_output.hpp"
 #include "fusion_engine_msgs/msg/wheel_speed_output.hpp"

@@ -15,6 +15,13 @@
 #include "nmea_msgs/msg/sentence.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
+#include "fusion_engine_msgs/msg/pose.hpp"
+#include "fusion_engine_msgs/msg/pose_aux.hpp"
+#include "fusion_engine_msgs/msg/calibration_status.hpp"
+#include "fusion_engine_msgs/msg/relative_enu_position.hpp"
+#include "fusion_engine_msgs/msg/gnss_info.hpp"
+#include "fusion_engine_msgs/msg/gnss_satellite.hpp"
+#include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
 #include "fusion_engine_msgs/msg/imu_output.hpp"
 #include "fusion_engine_msgs/msg/gnss_attitude_output.hpp"
 #include "fusion_engine_msgs/msg/wheel_speed_output.hpp"
@@ -31,7 +38,183 @@ class ConversionUtils {
   public:
   
   /***********************************************************************************************************/
-  /* Filtered Utils */
+  /* Filtered / Navigation Utils */
+static fusion_engine_msgs::msg::Pose populate(const point_one::fusion_engine::messages::PoseMessage& contents) {
+  fusion_engine_msgs::msg::Pose msg;
+
+  msg.p1_time.seconds     = contents.p1_time.seconds;
+  msg.p1_time.fraction_ns = contents.p1_time.fraction_ns;
+  msg.gps_time.seconds    = contents.gps_time.seconds;
+  msg.gps_time.fraction_ns= contents.gps_time.fraction_ns;
+
+  msg.solution_type = static_cast<uint8_t>(contents.solution_type);
+  msg.flags         = contents.flags;
+  msg.undulation_cm = contents.undulation_cm;
+
+  msg.latitude_deg  = contents.lla_deg[0];
+  msg.longitude_deg = contents.lla_deg[1];
+  msg.altitude_m    = contents.lla_deg[2];
+
+  msg.position_std_enu_m[0] = contents.position_std_enu_m[0];
+  msg.position_std_enu_m[1] = contents.position_std_enu_m[1];
+  msg.position_std_enu_m[2] = contents.position_std_enu_m[2];
+
+  msg.ypr_deg[0] = contents.ypr_deg[0];
+  msg.ypr_deg[1] = contents.ypr_deg[1];
+  msg.ypr_deg[2] = contents.ypr_deg[2];
+
+  msg.ypr_std_deg[0] = contents.ypr_std_deg[0];
+  msg.ypr_std_deg[1] = contents.ypr_std_deg[1];
+  msg.ypr_std_deg[2] = contents.ypr_std_deg[2];
+
+  msg.velocity_flu_mps[0] = contents.velocity_body_mps[0];
+  msg.velocity_flu_mps[1] = contents.velocity_body_mps[1];
+  msg.velocity_flu_mps[2] = contents.velocity_body_mps[2];
+
+  msg.velocity_std_flu_mps[0] = contents.velocity_std_body_mps[0];
+  msg.velocity_std_flu_mps[1] = contents.velocity_std_body_mps[1];
+  msg.velocity_std_flu_mps[2] = contents.velocity_std_body_mps[2];
+
+  msg.aggregate_protection_level_m  = contents.aggregate_protection_level_m;
+  msg.horizontal_protection_level_m = contents.horizontal_protection_level_m;
+  msg.vertical_protection_level_m   = contents.vertical_protection_level_m;
+
+  return msg;
+}
+
+static fusion_engine_msgs::msg::PoseAux populate(const point_one::fusion_engine::messages::PoseAuxMessage& contents) {
+  fusion_engine_msgs::msg::PoseAux msg;
+
+  msg.p1_time.seconds      = contents.p1_time.seconds;
+  msg.p1_time.fraction_ns  = contents.p1_time.fraction_ns;
+
+  msg.position_std_body_m[0] = contents.position_std_body_m[0];
+  msg.position_std_body_m[1] = contents.position_std_body_m[1];
+  msg.position_std_body_m[2] = contents.position_std_body_m[2];
+
+  std::copy(std::begin(contents.position_std_body_m),
+            std::end(contents.position_std_body_m),
+            std::begin(msg.position_std_body_m));
+
+  msg.attitude_quaternion[0] = contents.attitude_quaternion[0];
+  msg.attitude_quaternion[1] = contents.attitude_quaternion[1];
+  msg.attitude_quaternion[2] = contents.attitude_quaternion[2];
+  msg.attitude_quaternion[3] = contents.attitude_quaternion[3];
+
+  msg.velocity_enu_mps[0] = contents.velocity_enu_mps[0];
+  msg.velocity_enu_mps[1] = contents.velocity_enu_mps[1];
+  msg.velocity_enu_mps[2] = contents.velocity_enu_mps[2];
+
+  msg.velocity_std_enu_mps[0] = contents.velocity_std_enu_mps[0];
+  msg.velocity_std_enu_mps[1] = contents.velocity_std_enu_mps[1];
+  msg.velocity_std_enu_mps[2] = contents.velocity_std_enu_mps[2];
+
+  return msg;
+}
+
+// GNSS Info
+static fusion_engine_msgs::msg::GnssInfo populate(const point_one::fusion_engine::messages::GNSSInfoMessage& contents) {
+  fusion_engine_msgs::msg::GnssInfo msg;
+
+  msg.p1_time.seconds      = contents.p1_time.seconds;
+  msg.p1_time.fraction_ns  = contents.p1_time.fraction_ns;
+  msg.gps_time.seconds     = contents.gps_time.seconds;
+  msg.gps_time.fraction_ns = contents.gps_time.fraction_ns;
+
+  msg.leap_second     = contents.leap_second;
+  msg.num_satellites        = contents.num_svs;
+  msg.corrections_age_decisec = contents.corrections_age * 0.1;
+  msg.baseline_distance_m = contents.baseline_distance * 10;
+  msg.reference_station_id = contents.reference_station_id;
+
+  msg.gdop = contents.gdop;
+  msg.pdop = contents.pdop;
+  msg.hdop = contents.hdop;
+  msg.vdop = contents.vdop;
+
+  msg.gps_time_std_dev_s = contents.gps_time_std_sec;
+
+  return msg;
+}
+
+// GNSS Satellite Info
+static fusion_engine_msgs::msg::GnssSatelliteInfo populate(const point_one::fusion_engine::messages::SatelliteInfo& sat) {
+  fusion_engine_msgs::msg::GnssSatelliteInfo msg;
+  msg.prn           = sat.prn;
+  msg.constellation = static_cast<uint8_t>(sat.system);
+  msg.cn0_db_hz     = sat.cn0;
+  msg.elevation_deg = sat.elevation_deg;
+  msg.azimuth_deg   = sat.azimuth_deg;
+  msg.usage         = sat.usage;
+  return msg;
+}
+
+static fusion_engine_msgs::msg::GnssSatellite populate(const point_one::fusion_engine::messages::GNSSSatelliteMessage& contents) {
+  fusion_engine_msgs::msg::GnssSatellite msg;
+
+  msg.p1_time.seconds      = contents.p1_time.seconds;
+  msg.p1_time.fraction_ns  = contents.p1_time.fraction_ns;
+  msg.gps_time.seconds     = contents.gps_time.seconds;
+  msg.gps_time.fraction_ns = contents.gps_time.fraction_ns;
+
+  msg.num_satellites = contents.num_satellites;
+  return msg;
+}
+
+// Calibration Status
+static fusion_engine_msgs::msg::CalibrationStatus populate(const point_one::fusion_engine::messages::CalibrationStatusMessage& contents) {
+  fusion_engine_msgs::msg::CalibrationStatus msg;
+
+  msg.p1_time.seconds      = contents.p1_time.seconds;
+  msg.p1_time.fraction_ns  = contents.p1_time.fraction_ns;
+
+  msg.calibration_stage = static_cast<uint8_t>(contents.calibration_stage);
+
+  msg.ypr_mounting_angle[0] = contents.ypr_deg[0];
+  msg.ypr_mounting_angle[1] = contents.ypr_deg[1];
+  msg.ypr_mounting_angle[2] = contents.ypr_deg[2];
+
+  msg.ypr_std_dev_deg[0] = contents.ypr_std_dev_deg[0];
+  msg.ypr_std_dev_deg[1] = contents.ypr_std_dev_deg[1];
+  msg.ypr_std_dev_deg[2] = contents.ypr_std_dev_deg[2];
+
+  msg.travel_distance_m = contents.travel_distance_m;
+  msg.state_verified    = contents.state_verified;
+
+  msg.gyro_bias_percent        = contents.gyro_bias_percent_complete;
+  msg.accel_bias_percent       = contents.accel_bias_percent_complete;
+  msg.mounting_angle_bias_percent = contents.mounting_angle_percent_complete;
+
+  msg.min_travel_distance_m = contents.min_travel_distance_m;
+  msg.max_ypr_std_dev_deg[0] = contents.mounting_angle_max_std_dev_deg[0];
+  msg.max_ypr_std_dev_deg[1] = contents.mounting_angle_max_std_dev_deg[1];
+  msg.max_ypr_std_dev_deg[2] = contents.mounting_angle_max_std_dev_deg[2];
+
+  return msg;
+}
+
+// Relative ENU Position
+static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fusion_engine::messages::RelativeENUPositionMessage& contents) {
+  fusion_engine_msgs::msg::RelativeEnuPosition msg;
+
+  msg.p1_time.seconds      = contents.p1_time.seconds;
+  msg.p1_time.fraction_ns  = contents.p1_time.fraction_ns;
+  msg.gps_time.seconds     = contents.gps_time.seconds;
+  msg.gps_time.fraction_ns = contents.gps_time.fraction_ns;
+
+  msg.solution_type        = static_cast<uint8_t>(contents.solution_type);
+  msg.reference_station_id = contents.reference_station_id;
+
+  msg.east_m  = contents.relative_position_enu_m[0];
+  msg.north_m = contents.relative_position_enu_m[1];
+  msg.up_m    = contents.relative_position_enu_m[2];
+
+  msg.east_std_m  = contents.position_std_enu_m[0];
+  msg.north_std_m = contents.position_std_enu_m[1];
+  msg.up_std_m    = contents.position_std_enu_m[2];
+
+  return msg;
+}
 
   /***********************************************************************************************************/
   /* Calibrated Utils */

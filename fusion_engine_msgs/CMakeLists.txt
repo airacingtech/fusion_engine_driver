@@ -8,6 +8,14 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/Timestamp.msg"
+  "msg/Pose.msg"
+  "msg/PoseAux.msg"
+  "msg/GnssInfo.msg"
+  "msg/GnssSatellite.msg"
+  "msg/GnssSatelliteInfo.msg"
+  "msg/CalibrationStatus.msg"
+  "msg/RelativeEnuPosition.msg"
   "msg/ImuOutput.msg"
   "msg/WheelSpeedOutput.msg"
   "msg/VehicleSpeedOutput.msg"
