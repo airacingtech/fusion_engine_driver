@@ -239,7 +239,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_IMU_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawIMUOutput *>(payload);
-        fusion_engine_msgs::msg::RawImuOutput msg = populate(contents);
+        fusion_engine_msgs::msg::RawImuOutput msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -248,7 +248,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_GNSS_ATTITUDE_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawGNSSAttitudeOutput *>(payload);
-        fusion_engine_msgs::msg::RawGnssAttitudeOutput msg = populate(contents);
+        fusion_engine_msgs::msg::RawGnssAttitudeOutput msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -257,7 +257,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_WHEEL_TICK_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawWheelTickOutput *>(payload);
-        fusion_engine_msgs::msg::RawWheelTickOutput msg = populate(contents);
+        fusion_engine_msgs::msg::RawWheelTickOutput msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -266,7 +266,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_VEHICLE_TICK_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawVehicleTickOutput *>(payload);
-        fusion_engine_msgs::msg::RawVehicleTickOutput msg = populate(contents);
+        fusion_engine_msgs::msg::RawVehicleTickOutput msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -275,7 +275,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_WHEEL_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawWheelSpeedOutput *>(payload);
-        fusion_engine_msgs::msg::RawWheelSpeedOutput msg = populate(contents);
+        fusion_engine_msgs::msg::RawWheelSpeedOutput msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -284,7 +284,9 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_VEHICLE_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawVehicleSpeedOutput *>(payload);
-        fusion_engine_msgs::msg::RawVehicleSpeedOutput msg = populate(contents);
+        fusion_engine_msgs::msg::RawVehicleSpeedOutput msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
         break;
       }
