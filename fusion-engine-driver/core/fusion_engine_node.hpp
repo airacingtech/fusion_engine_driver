@@ -47,8 +47,7 @@ class FusionEngineNode : public rclcpp::Node {
    *
    */
   FusionEngineInterface fe_interface_;
-
-
+  
   /**
    * @brief Publishers for Navigation Messages
    * Pose (10000)

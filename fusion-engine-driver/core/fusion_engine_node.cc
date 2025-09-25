@@ -202,12 +202,11 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
                                                    const void *payload) {
   auto time = now();
   auto type = header.message_type;
-  auto it = kFactory().find(type);
   switch(type) {
-    case MessageType::POSE:
+    case MessageType::ROS_POSE:
       {
         auto &contents = *reinterpret_cast<
-            const point_one::fusion_engine::messages::PoseMessage *>(payload);
+            const point_one::fusion_engine::messages::ros::PoseMessage *>(payload);
         geometry_msgs::msg::PoseStamped pos = ConversionUtils::toPose(contents);
         visualization_msgs::msg::Marker points;
         pos.header.frame_id = frame_id_;
