@@ -233,26 +233,31 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_GNSS_ATTITUDE_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawGNSSAttitudeOutput *>(payload);
+        kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::RAW_WHEEL_TICK_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawWheelTickOutput *>(payload);
+        kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::RAW_VEHICLE_TICK_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawVehicleTickOutput *>(payload);
+        kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::RAW_WHEEL_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawWheelSpeedOutput *>(payload);
+        kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::RAW_VEHICLE_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawVehicleSpeedOutput *>(payload);
+        kFactory().at(type)(this, &contents);
         break;
       }
     // ROS Messages
