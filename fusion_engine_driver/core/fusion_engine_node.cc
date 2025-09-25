@@ -177,62 +177,62 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::POSE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::GNSS_INFO:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::GNSSInfoMessage *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::GNSS_SATELLITE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::GNSSSatelliteMessage *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::POSE_AUX:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseAuxMessage *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::CALIBRATION_STATUS:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::CalibrationStatusMessage *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::RELATIVE_ENU_POSITION:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RelativeENUPositionMessage *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     // Calibrated Sensors
     case MessageType::IMU_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::IMUOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::GNSS_ATTITUDE_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::GNSSAttitudeOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::WHEEL_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::WheelSpeedOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::VEHICLE_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::VehicleSpeedOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        //kFactory().at(type)(this, &contents);
         break;
       }
     // Raw Sensors
