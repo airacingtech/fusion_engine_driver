@@ -8,6 +8,10 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/ImuOutput.msg"
+  "msg/WheelSpeedOutput.msg"
+  "msg/VehicleSpeedOutput.msg"
+  "msg/GnssAttitudeOutput.msg"
   "msg/RawImuOutput.msg"
   "msg/RawWheelSpeedOutput.msg"
   "msg/RawVehicleSpeedOutput.msg"

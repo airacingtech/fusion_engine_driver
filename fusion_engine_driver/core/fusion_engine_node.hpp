@@ -20,6 +20,10 @@
 #include "nmea_msgs/msg/sentence.hpp"
 
 #include "fusion_engine_interface.hpp"
+#include "fusion_engine_msgs/msg/imu_output.hpp"
+#include "fusion_engine_msgs/msg/gnss_attitude_output.hpp"
+#include "fusion_engine_msgs/msg/wheel_speed_output.hpp"
+#include "fusion_engine_msgs/msg/vehicle_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_gnss_attitude_output.hpp"
 #include "fusion_engine_msgs/msg/raw_imu_output.hpp"
 #include "fusion_engine_msgs/msg/raw_vehicle_speed_output.hpp"

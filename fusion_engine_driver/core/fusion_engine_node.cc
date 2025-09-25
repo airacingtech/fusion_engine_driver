@@ -95,23 +95,23 @@ static const std::unordered_map<MessageType, Factory>& kFactory() {
     // Calibrated Outputs
     {MessageType::IMU_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
-      "imu_calibrated", rclcpp::SensorDataQoS());
+        "imu_calibrated", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
     }},
     {MessageType::GNSS_ATTITUDE_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
-      "gnss_attitude", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::GnssAttitudeOutput>(
+        "gnss_attitude", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::GnssAttitudeOutput*>(msg));
     }},
     {MessageType::WHEEL_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "wheel_speed", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::WheelSpeedOutput>(
+        "wheel_speed", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::WheelSpeedOutput*>(msg));
     }},
     {MessageType::VEHICLE_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "vehicle_speed", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::VehicleSpeedOutput>(
+        "vehicle_speed", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::VehicleSpeedOutput*>(msg));
     }},
 
     // Raw Outputs
@@ -214,25 +214,37 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::IMU_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::IMUOutput *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::ImuOutput msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::GNSS_ATTITUDE_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::GNSSAttitudeOutput *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::GnssAttitudeOutput msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::WHEEL_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::WheelSpeedOutput *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::WheelSpeedOutput msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::VEHICLE_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::VehicleSpeedOutput *>(payload);
-        //kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::VehicleSpeedOutput msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     // Raw Sensors

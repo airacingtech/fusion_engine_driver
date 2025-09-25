@@ -15,6 +15,10 @@
 #include "nmea_msgs/msg/sentence.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
+#include "fusion_engine_msgs/msg/imu_output.hpp"
+#include "fusion_engine_msgs/msg/gnss_attitude_output.hpp"
+#include "fusion_engine_msgs/msg/wheel_speed_output.hpp"
+#include "fusion_engine_msgs/msg/vehicle_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_gnss_attitude_output.hpp"
 #include "fusion_engine_msgs/msg/raw_imu_output.hpp"
 #include "fusion_engine_msgs/msg/raw_vehicle_speed_output.hpp"
@@ -25,59 +29,61 @@
 
 class ConversionUtils {
   public:
+  
+  /***********************************************************************************************************/
+  /* Filtered Utils */
 
   /***********************************************************************************************************/
-  /* ROS Utils */
-  static geometry_msgs::msg::PoseStamped populate(const point_one::fusion_engine::messages::ros::PoseMessage& contents) {
-    geometry_msgs::msg::PoseStamped msg;
-    msg.pose.position.x    = contents.position_rel_m[0]; msg.pose.position.y    = contents.position_rel_m[1]; msg.pose.position.z    = contents.position_rel_m[2];
-    msg.pose.orientation.x = contents.orientation[0];    msg.pose.orientation.y = contents.orientation[1];    msg.pose.orientation.z = contents.orientation[2]; msg.pose.orientation.w = contents.orientation[3];
+  /* Calibrated Utils */
+
+  static fusion_engine_msgs::msg::ImuOutput populate(const point_one::fusion_engine::messages::IMUOutput& contents) {
+    fusion_engine_msgs::msg::ImuOutput msg;
+
+    msg.accel[0] = contents.accel_mps2[0]; msg.accel[1] = contents.accel_mps2[1]; msg.accel[2] = contents.accel_mps2[2];
+    msg.accel_std[0] = contents.accel_std_mps2[0]; msg.accel_std[1] = contents.accel_std_mps2[1]; msg.accel_std[2] = contents.accel_std_mps2[2];
+
+    msg.gyro[0] = contents.gyro_rps[0]; msg.gyro[1] = contents.gyro_rps[1]; msg.gyro[2] = contents.gyro_rps[2];
+    msg.gyro_std[0] = contents.gyro_std_rps[0]; msg.gyro_std[1] = contents.gyro_std_rps[1]; msg.gyro_std[2] = contents.gyro_std_rps[2];
     return msg;
   }
 
-  static gps_msgs::msg::GPSFix populate(const point_one::fusion_engine::messages::ros::GPSFixMessage& contents) {
-    gps_msgs::msg::GPSFix msg;
-    msg.latitude  = contents.latitude_deg;    msg.longitude = contents.longitude_deg;
-    msg.altitude  = contents.altitude_m;      msg.track     = contents.track_deg;
-    msg.speed     = contents.speed_mps;       msg.climb     = contents.climb_mps;
-    msg.pitch     = contents.pitch_deg;       msg.roll      = contents.roll_deg;       msg.dip = contents.dip_deg;
+  static fusion_engine_msgs::msg::GnssAttitudeOutput populate(const point_one::fusion_engine::messages::GNSSAttitudeOutput& contents) {
+    fusion_engine_msgs::msg::GnssAttitudeOutput msg;
 
-    msg.time      = contents.p1_time.seconds;
-    
-    msg.gdop      = contents.gdop;           msg.pdop      = contents.pdop;           msg.hdop = contents.hdop;
-    msg.vdop      = contents.vdop;           msg.tdop      = contents.tdop;
+    msg.solution_type = static_cast<int>(contents.solution_type);
+    msg.flags         = contents.flags;
 
-    msg.err       = contents.err_3d_m;       msg.err_horz  = contents.err_horiz_m;    msg.err_vert  = contents.err_vert_m;
-    msg.err_track = contents.err_track_deg;  msg.err_speed = contents.err_speed_mps;  msg.err_climb = contents.err_climb_mps;
-    msg.err_pitch = contents.err_pitch_deg;  msg.err_roll  = contents.err_roll_deg;   msg.err_dip   = contents.err_dip_deg;
-    msg.err_time  = contents.err_time_sec;
-    std::copy(std::begin(contents.position_covariance_m2), std::end(contents.position_covariance_m2),
-              std::begin(msg.position_covariance));
-    msg.position_covariance_type = contents.position_covariance_type;
+
+    msg.ypr_deg[0] = contents.ypr_deg[0]; msg.ypr_deg[1] = contents.ypr_deg[1]; msg.ypr_deg[2] = contents.ypr_deg[2];
+    msg.ypr_std_deg[0] = contents.ypr_std_deg[0]; msg.ypr_std_deg[1] = contents.ypr_std_deg[1]; msg.ypr_std_deg[2] = contents.ypr_std_deg[2];
+
+    msg.baseline_distance_m      = contents.baseline_distance_m;
+    msg.baseline_distance_std_m  = contents.baseline_distance_std_m;
+
     return msg;
   }
 
-  static sensor_msgs::msg::Imu populate(const point_one::fusion_engine::messages::ros::IMUMessage& contents) {
-    sensor_msgs::msg::Imu msg;
-    msg.orientation.x = contents.orientation[0]; msg.orientation.y = contents.orientation[1];
-    msg.orientation.z = contents.orientation[2]; msg.orientation.w = contents.orientation[3];
+  static fusion_engine_msgs::msg::WheelSpeedOutput populate(const point_one::fusion_engine::messages::WheelSpeedOutput& contents) {
+    fusion_engine_msgs::msg::WheelSpeedOutput msg;
 
-    msg.angular_velocity.x = contents.angular_velocity_rps[0];
-    msg.angular_velocity.y = contents.angular_velocity_rps[1];
-    msg.angular_velocity.z = contents.angular_velocity_rps[2];
+    msg.front_left_speed  = contents.front_left_speed_mps;
+    msg.front_right_speed = contents.front_right_speed_mps;
+    msg.rear_left_speed   = contents.rear_left_speed_mps;
+    msg.rear_right_speed  = contents.rear_right_speed_mps;
 
-    msg.linear_acceleration.x = contents.acceleration_mps2[0];
-    msg.linear_acceleration.y = contents.acceleration_mps2[1];
-    msg.linear_acceleration.z = contents.acceleration_mps2[2];
+    msg.gear  = static_cast<int>(contents.gear);
+    msg.flags = contents.flags;
 
-    std::copy(std::begin(contents.orientation_covariance), std::end(contents.orientation_covariance),
-              std::begin(msg.orientation_covariance));
+    return msg;
+  }
 
-    std::copy(std::begin(contents.angular_velocity_covariance), std::end(contents.angular_velocity_covariance),
-              std::begin(msg.angular_velocity_covariance));
+  static fusion_engine_msgs::msg::VehicleSpeedOutput populate(const point_one::fusion_engine::messages::VehicleSpeedOutput& contents) {
+    fusion_engine_msgs::msg::VehicleSpeedOutput msg;
 
-    std::copy(std::begin(contents.acceleration_covariance), std::end(contents.acceleration_covariance),
-              std::begin(msg.linear_acceleration_covariance));
+    msg.speed = contents.vehicle_speed_mps;
+    msg.gear  = static_cast<int>(contents.gear);
+    msg.flags = contents.flags;
+
     return msg;
   }
 
@@ -145,13 +151,68 @@ class ConversionUtils {
     msg.gear = static_cast<int>(contents.gear);
     return msg;
   }
+  
+  static fusion_engine_msgs::msg::RawVehicleTickOutput populate(const point_one::fusion_engine::messages::RawVehicleTickOutput& contents) {
+    fusion_engine_msgs::msg::RawVehicleTickOutput msg;
+    msg.tick_count = contents.tick_count;
+    msg.gear = static_cast<int>(contents.gear);
+    return msg;
+  }
 
-static fusion_engine_msgs::msg::RawVehicleTickOutput populate(const point_one::fusion_engine::messages::RawVehicleTickOutput& contents) {
-  fusion_engine_msgs::msg::RawVehicleTickOutput msg;
-  msg.tick_count = contents.tick_count;
-  msg.gear = static_cast<int>(contents.gear);
-  return msg;
-}
+  /***********************************************************************************************************/
+  /* ROS Utils */
+  static geometry_msgs::msg::PoseStamped populate(const point_one::fusion_engine::messages::ros::PoseMessage& contents) {
+    geometry_msgs::msg::PoseStamped msg;
+    msg.pose.position.x    = contents.position_rel_m[0]; msg.pose.position.y    = contents.position_rel_m[1]; msg.pose.position.z    = contents.position_rel_m[2];
+    msg.pose.orientation.x = contents.orientation[0];    msg.pose.orientation.y = contents.orientation[1];    msg.pose.orientation.z = contents.orientation[2]; msg.pose.orientation.w = contents.orientation[3];
+    return msg;
+  }
+
+  static gps_msgs::msg::GPSFix populate(const point_one::fusion_engine::messages::ros::GPSFixMessage& contents) {
+    gps_msgs::msg::GPSFix msg;
+    msg.latitude  = contents.latitude_deg;    msg.longitude = contents.longitude_deg;
+    msg.altitude  = contents.altitude_m;      msg.track     = contents.track_deg;
+    msg.speed     = contents.speed_mps;       msg.climb     = contents.climb_mps;
+    msg.pitch     = contents.pitch_deg;       msg.roll      = contents.roll_deg;       msg.dip = contents.dip_deg;
+
+    msg.time      = contents.p1_time.seconds;
+    
+    msg.gdop      = contents.gdop;           msg.pdop      = contents.pdop;           msg.hdop = contents.hdop;
+    msg.vdop      = contents.vdop;           msg.tdop      = contents.tdop;
+
+    msg.err       = contents.err_3d_m;       msg.err_horz  = contents.err_horiz_m;    msg.err_vert  = contents.err_vert_m;
+    msg.err_track = contents.err_track_deg;  msg.err_speed = contents.err_speed_mps;  msg.err_climb = contents.err_climb_mps;
+    msg.err_pitch = contents.err_pitch_deg;  msg.err_roll  = contents.err_roll_deg;   msg.err_dip   = contents.err_dip_deg;
+    msg.err_time  = contents.err_time_sec;
+    std::copy(std::begin(contents.position_covariance_m2), std::end(contents.position_covariance_m2),
+              std::begin(msg.position_covariance));
+    msg.position_covariance_type = contents.position_covariance_type;
+    return msg;
+  }
+
+  static sensor_msgs::msg::Imu populate(const point_one::fusion_engine::messages::ros::IMUMessage& contents) {
+    sensor_msgs::msg::Imu msg;
+    msg.orientation.x = contents.orientation[0]; msg.orientation.y = contents.orientation[1];
+    msg.orientation.z = contents.orientation[2]; msg.orientation.w = contents.orientation[3];
+
+    msg.angular_velocity.x = contents.angular_velocity_rps[0];
+    msg.angular_velocity.y = contents.angular_velocity_rps[1];
+    msg.angular_velocity.z = contents.angular_velocity_rps[2];
+
+    msg.linear_acceleration.x = contents.acceleration_mps2[0];
+    msg.linear_acceleration.y = contents.acceleration_mps2[1];
+    msg.linear_acceleration.z = contents.acceleration_mps2[2];
+
+    std::copy(std::begin(contents.orientation_covariance), std::end(contents.orientation_covariance),
+              std::begin(msg.orientation_covariance));
+
+    std::copy(std::begin(contents.angular_velocity_covariance), std::end(contents.angular_velocity_covariance),
+              std::begin(msg.angular_velocity_covariance));
+
+    std::copy(std::begin(contents.acceleration_covariance), std::end(contents.acceleration_covariance),
+              std::begin(msg.linear_acceleration_covariance));
+    return msg;
+  }  
 
   /***********************************************************************************************************/
   /**
