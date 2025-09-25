@@ -1,0 +1,5 @@
+std_msgs/Header header
+uint8 solution_type
+uint32 flags
+geometry_msgs/Vector3 relative_position_enu_m
+geometry_msgs/Vector3 position_std_enu_m

@@ -116,36 +116,36 @@ static const std::unordered_map<MessageType, Factory>& kFactory() {
 
     // Raw Outputs
     {MessageType::RAW_IMU_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
-      "imu_raw", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawImuOutput>(
+          "imu_raw", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawImuOutput*>(msg));
     }},
     {MessageType::RAW_GNSS_ATTITUDE_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
-      "gnss_attitude_raw", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawGnssAttitudeOutput>(
+          "gnss_attitude_raw", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawGnssAttitudeOutput*>(msg));
     }},
     {MessageType::RAW_WHEEL_TICK_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "wheel_tick_raw", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawWheelTickOutput>(
+          "wheel_tick_raw", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawWheelTickOutput*>(msg));
     }},
     {MessageType::RAW_VEHICLE_TICK_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "vehicle_tick_raw", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawVehicleTickOutput>(
+          "vehicle_tick_raw", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawVehicleTickOutput*>(msg));
     }},
     {MessageType::RAW_WHEEL_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "wheel_speed_raw", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawWheelSpeedOutput>(
+          "wheel_speed_raw", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawWheelSpeedOutput*>(msg));
     }},
     {MessageType::RAW_VEHICLE_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "vehicle_speed_raw", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawVehicleSpeedOutput>(
+          "vehicle_speed_raw", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawVehicleSpeedOutput*>(msg));
     }},
-
+    // Note: No publisher for RawWheelTickOutput (11123) and RawVehicleTickOutput (11124) in original code
     // ROS Outputs
     {MessageType::ROS_POSE, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
@@ -227,6 +227,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_IMU_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawIMUOutput *>(payload);
+        kFactory().at(type)(this, &contents);
         break;
       }
     case MessageType::RAW_GNSS_ATTITUDE_OUTPUT:

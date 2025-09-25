@@ -1,0 +1,6 @@
+std_msgs/Header header
+uint32 front_left_wheel_ticks
+uint32 front_right_wheel_ticks
+uint32 rear_left_wheel_ticks
+uint32 rear_right_wheel_ticks
+uint8 gear

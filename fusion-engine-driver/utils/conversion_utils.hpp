@@ -15,11 +15,19 @@
 #include "nmea_msgs/msg/sentence.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
+#include "fusion_engine_msgs/msg/raw_gnss_attitude_output.hpp"
+#include "fusion_engine_msgs/msg/raw_imu_output.hpp"
+#include "fusion_engine_msgs/msg/raw_vehicle_speed_output.hpp"
+#include "fusion_engine_msgs/msg/raw_vehicle_tick_output.hpp"
+#include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
+#include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
+
+
 class ConversionUtils {
   public:
 
   /***********************************************************************************************************/
-  /* ROS Wrappers */
+  /* ROS Utils */
   static geometry_msgs::msg::PoseStamped populate(const point_one::fusion_engine::messages::ros::PoseMessage& contents) {
     geometry_msgs::msg::PoseStamped msg;
     msg.pose.position.x    = contents.position_rel_m[0]; msg.pose.position.y    = contents.position_rel_m[1]; msg.pose.position.z    = contents.position_rel_m[2];
@@ -43,8 +51,7 @@ class ConversionUtils {
     msg.err_track = contents.err_track_deg;  msg.err_speed = contents.err_speed_mps;  msg.err_climb = contents.err_climb_mps;
     msg.err_pitch = contents.err_pitch_deg;  msg.err_roll  = contents.err_roll_deg;   msg.err_dip   = contents.err_dip_deg;
     msg.err_time  = contents.err_time_sec;
-    std::copy(std::begin(contents.position_covariance_m2),
-              std::end(contents.position_covariance_m2),
+    std::copy(std::begin(contents.position_covariance_m2), std::end(contents.position_covariance_m2),
               std::begin(msg.position_covariance));
     msg.position_covariance_type = contents.position_covariance_type;
     return msg;
@@ -55,28 +62,80 @@ class ConversionUtils {
     msg.orientation.x = contents.orientation[0]; msg.orientation.y = contents.orientation[1];
     msg.orientation.z = contents.orientation[2]; msg.orientation.w = contents.orientation[3];
 
-    std::copy(std::begin(contents.orientation_covariance),
-              std::end(contents.orientation_covariance),
-              std::begin(msg.orientation_covariance));
-
     msg.angular_velocity.x = contents.angular_velocity_rps[0];
     msg.angular_velocity.y = contents.angular_velocity_rps[1];
     msg.angular_velocity.z = contents.angular_velocity_rps[2];
-
-    std::copy(std::begin(contents.angular_velocity_covariance),
-              std::end(contents.angular_velocity_covariance),
-              std::begin(msg.angular_velocity_covariance));
 
     msg.linear_acceleration.x = contents.acceleration_mps2[0];
     msg.linear_acceleration.y = contents.acceleration_mps2[1];
     msg.linear_acceleration.z = contents.acceleration_mps2[2];
 
-    std::copy(std::begin(contents.acceleration_covariance),
-              std::end(contents.acceleration_covariance),
+    std::copy(std::begin(contents.orientation_covariance), std::end(contents.orientation_covariance),
+              std::begin(msg.orientation_covariance));
+
+    std::copy(std::begin(contents.angular_velocity_covariance), std::end(contents.angular_velocity_covariance),
+              std::begin(msg.angular_velocity_covariance));
+
+    std::copy(std::begin(contents.acceleration_covariance), std::end(contents.acceleration_covariance),
               std::begin(msg.linear_acceleration_covariance));
     return msg;
   }
 
+  /***********************************************************************************************************/
+  /* Raw Utils */
+  
+  static fusion_engine_msgs::msg::RawImuOutput populate(const point_one::fusion_engine::messages::RawIMUOutput& contents) {
+    fusion_engine_msgs::msg::RawImuOutput msg;
+    msg.temperature = contents.temperature;
+    msg.accel[0] = contents.accel[0]; msg.accel[1] = contents.accel[1]; msg.accel[2] = contents.accel[2];
+    msg.gyro[0]  = contents.gyro[0];  msg.gyro[1]  = contents.gyro[1];  msg.gyro[2]  = contents.gyro[2];
+    return msg;
+  }
+  
+  static fusion_engine_msgs::msg::RawGnssAttitudeOutput populate(const point_one::fusion_engine::messages::RawGNSSAttitudeOutput& contents) {
+    fusion_engine_msgs::msg::RawGnssAttitudeOutput msg;
+    msg.solution_type = static_cast<int>(contents.solution_type);
+    msg.flags         = contents.flags;
+
+    msg.relative_position_enu_m.x = contents.relative_position_enu_m[0]; msg.relative_position_enu_m.y = contents.relative_position_enu_m[1]; msg.relative_position_enu_m.z = contents.relative_position_enu_m[2];
+    msg.position_std_enu_m.x = contents.position_std_enu_m[0]; msg.position_std_enu_m.y = contents.position_std_enu_m[1]; msg.position_std_enu_m.z = contents.position_std_enu_m[2];
+    return msg;
+  }
+
+
+  static fusion_engine_msgs::msg::RawWheelSpeedOutput populate(const point_one::fusion_engine::messages::RawWheelSpeedOutput& contents) {
+    fusion_engine_msgs::msg::RawWheelSpeedOutput msg;
+    msg.front_left_speed  = contents.front_left_speed; msg.front_right_speed = contents.front_right_speed;
+    msg.rear_left_speed   = contents.rear_left_speed;   msg.rear_right_speed  = contents.rear_right_speed;
+    msg.gear = static_cast<int>(contents.gear);
+    return msg;
+  }
+
+  static fusion_engine_msgs::msg::RawVehicleSpeedOutput populate(const point_one::fusion_engine::messages::RawVehicleSpeedOutput& contents) {
+    fusion_engine_msgs::msg::RawVehicleSpeedOutput msg;
+    msg.vehicle_speed = contents.vehicle_speed;
+    msg.gear = static_cast<int>(contents.gear);
+    return msg;
+  }
+
+  static fusion_engine_msgs::msg::RawWheelTickOutput populate(const point_one::fusion_engine::messages::RawWheelTickOutput& contents) {
+    fusion_engine_msgs::msg::RawWheelTickOutput msg;
+    msg.front_left_wheel_ticks  = contents.front_left_wheel_ticks;
+    msg.front_right_wheel_ticks = contents.front_right_wheel_ticks;
+    msg.rear_left_wheel_ticks   = contents.rear_left_wheel_ticks;
+    msg.rear_right_wheel_ticks  = contents.rear_right_wheel_ticks;
+    msg.gear = static_cast<int>(contents.gear);
+    return msg;
+  }
+
+static fusion_engine_msgs::msg::RawVehicleTickOutput populate(const point_one::fusion_engine::messages::RawVehicleTickOutput& contents) {
+  fusion_engine_msgs::msg::RawVehicleTickOutput msg;
+  msg.tick_count = contents.tick_count;
+  msg.gear = static_cast<int>(contents.gear);
+  return msg;
+}
+
+  /***********************************************************************************************************/
   /**
    * @brief Calculate the XOR checksum of a string message.
    *

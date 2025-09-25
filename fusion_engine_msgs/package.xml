@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>fusion_engine_msgs</name>
+  <version>0.0.1</version>
+  <description>Message definitions for Fusion Engine driver</description>
+  <maintainer email="d3shin@ucsd.edu">Kevin Shin</maintainer>
+  <license>TODO: License declaration</license>
+
+  <!-- Build tools -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <!-- Dependencies required for .msg definitions -->
+  <depend>builtin_interfaces</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+  <!-- Runtime dependencies for generated code -->
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+  <build_export_depend>rosidl_default_runtime</build_export_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

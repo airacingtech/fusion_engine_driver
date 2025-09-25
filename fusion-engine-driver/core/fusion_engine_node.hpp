@@ -4,18 +4,28 @@
 #include <thread>
 #include <unordered_map>
 
-#include "fusion_engine_interface.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "gps_msgs/msg/gps_fix.hpp"
-#include "gps_msgs/msg/gps_status.hpp"
-#include "mavros_msgs/msg/rtcm.hpp"
-#include "nmea_msgs/msg/sentence.hpp"
 #include "rclcpp/rclcpp.hpp"
+
+#include "std_msgs/msg/string.hpp"
+
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/nav_sat_status.hpp"
-#include "std_msgs/msg/string.hpp"
-#include "visualization_msgs/msg/marker.hpp"
+
+#include "gps_msgs/msg/gps_fix.hpp"
+#include "gps_msgs/msg/gps_status.hpp"
+
+#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "mavros_msgs/msg/rtcm.hpp"
+#include "nmea_msgs/msg/sentence.hpp"
+
+#include "fusion_engine_interface.hpp"
+#include "fusion_engine_msgs/msg/raw_gnss_attitude_output.hpp"
+#include "fusion_engine_msgs/msg/raw_imu_output.hpp"
+#include "fusion_engine_msgs/msg/raw_vehicle_speed_output.hpp"
+#include "fusion_engine_msgs/msg/raw_vehicle_tick_output.hpp"
+#include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
+#include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
 
 /**
  * @brief Point One Nav Atlas Node publishes realtime GPSFix/IMU/Pose messages.

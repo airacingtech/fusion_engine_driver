@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(fusion-engine-driver)
+project(fusion_engine_driver)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra)
@@ -34,6 +34,8 @@ find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(nmea_msgs REQUIRED)
+find_package(fusion_engine_msgs REQUIRED)
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -53,7 +55,18 @@ set(SRC
 add_executable(fusion_engine_ros_driver ${SRC})
 
 target_link_libraries(fusion_engine_ros_driver fusion_engine_client)
-ament_target_dependencies(fusion_engine_ros_driver rclcpp rclcpp_components std_msgs gps_msgs sensor_msgs geometry_msgs visualization_msgs mavros_msgs nmea_msgs)
+ament_target_dependencies(fusion_engine_ros_driver
+  rclcpp
+  rclcpp_components
+  std_msgs
+  gps_msgs
+  sensor_msgs
+  geometry_msgs
+  visualization_msgs
+  mavros_msgs
+  nmea_msgs
+  fusion_engine_msgs
+)
 
 install(TARGETS
   fusion_engine_ros_driver
