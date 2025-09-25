@@ -83,14 +83,31 @@ class ConversionUtils {
 
   /***********************************************************************************************************/
   /* Raw Utils */
-  
   static fusion_engine_msgs::msg::RawImuOutput populate(const point_one::fusion_engine::messages::RawIMUOutput& contents) {
     fusion_engine_msgs::msg::RawImuOutput msg;
-    msg.temperature = contents.temperature;
-    msg.accel[0] = contents.accel[0]; msg.accel[1] = contents.accel[1]; msg.accel[2] = contents.accel[2];
-    msg.gyro[0]  = contents.gyro[0];  msg.gyro[1]  = contents.gyro[1];  msg.gyro[2]  = contents.gyro[2];
+
+    // Convert accel (m/s² * 2^-16)
+    msg.accel[0] = (contents.accel[0] == INT32_MAX) ? NAN
+                 : static_cast<double>(contents.accel[0]) / 65536.0;
+    msg.accel[1] = (contents.accel[1] == INT32_MAX) ? NAN
+                 : static_cast<double>(contents.accel[1]) / 65536.0;
+    msg.accel[2] = (contents.accel[2] == INT32_MAX) ? NAN
+                 : static_cast<double>(contents.accel[2]) / 65536.0;
+    
+    // Convert gyro (rad/s * 2^-16)
+    msg.gyro[0] = (contents.gyro[0] == INT32_MAX) ? NAN
+                : static_cast<double>(contents.gyro[0]) / 65536.0;
+    msg.gyro[1] = (contents.gyro[1] == INT32_MAX) ? NAN
+                : static_cast<double>(contents.gyro[1]) / 65536.0;
+    msg.gyro[2] = (contents.gyro[2] == INT32_MAX) ? NAN
+                : static_cast<double>(contents.gyro[2]) / 65536.0;
+
+    // Convert temperature (°C * 2^-7)
+    msg.temperature = (contents.temperature == INT16_MAX) ? NAN
+                      : static_cast<double>(contents.temperature) / 128.0;
     return msg;
-  }
+    }
+
   
   static fusion_engine_msgs::msg::RawGnssAttitudeOutput populate(const point_one::fusion_engine::messages::RawGNSSAttitudeOutput& contents) {
     fusion_engine_msgs::msg::RawGnssAttitudeOutput msg;
