@@ -15,7 +15,7 @@ def generate_launch_description():
     fusion_node = Node(
         package='fusion_engine_driver',
         executable='fusion_engine_ros_driver',
-	name='fusion_engine_node',
+	    name='fusion_engine_node',
         output='screen',
         parameters=[param_file_path],
         remappings=[
@@ -41,10 +41,6 @@ def generate_launch_description():
             ('pose_ros', '/atlas/pose_ros'),
             ('gpsfix_ros', '/atlas/gpsfix_ros'),
             ('imu_ros', '/atlas/imu_ros')
-            #('nav_sat_fix', '/atlas/fix'),
-            #('gps_fix', '/atlas/gps'),
-            #('imu', '/atlas/imu'),
-            #('pose', '/atlas/pose'),
         ]
     )
 

@@ -181,9 +181,9 @@ static fusion_engine_msgs::msg::CalibrationStatus populate(const point_one::fusi
   msg.travel_distance_m = contents.travel_distance_m;
   msg.state_verified    = contents.state_verified;
 
-  msg.gyro_bias_percent        = contents.gyro_bias_percent_complete;
-  msg.accel_bias_percent       = contents.accel_bias_percent_complete;
-  msg.mounting_angle_bias_percent = contents.mounting_angle_percent_complete;
+  msg.gyro_bias_percent        = contents.gyro_bias_percent_complete * 0.5;
+  msg.accel_bias_percent       = contents.accel_bias_percent_complete * 0.5;
+  msg.mounting_angle_bias_percent = contents.mounting_angle_percent_complete * 0.5;
 
   msg.min_travel_distance_m = contents.min_travel_distance_m;
   msg.max_ypr_std_dev_deg[0] = contents.mounting_angle_max_std_dev_deg[0];
@@ -222,11 +222,21 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
   static fusion_engine_msgs::msg::ImuOutput populate(const point_one::fusion_engine::messages::IMUOutput& contents) {
     fusion_engine_msgs::msg::ImuOutput msg;
 
-    msg.accel[0] = contents.accel_mps2[0]; msg.accel[1] = contents.accel_mps2[1]; msg.accel[2] = contents.accel_mps2[2];
-    msg.accel_std[0] = contents.accel_std_mps2[0]; msg.accel_std[1] = contents.accel_std_mps2[1]; msg.accel_std[2] = contents.accel_std_mps2[2];
+    msg.linear_acceleration.x = contents.accel_mps2[0];
+    msg.linear_acceleration.y = contents.accel_mps2[1];
+    msg.linear_acceleration.z = contents.accel_mps2[2];
 
-    msg.gyro[0] = contents.gyro_rps[0]; msg.gyro[1] = contents.gyro_rps[1]; msg.gyro[2] = contents.gyro_rps[2];
-    msg.gyro_std[0] = contents.gyro_std_rps[0]; msg.gyro_std[1] = contents.gyro_std_rps[1]; msg.gyro_std[2] = contents.gyro_std_rps[2];
+    msg.linear_acceleration_covariance[0] = contents.accel_std_mps2[0] * contents.accel_std_mps2[0];
+    msg.linear_acceleration_covariance[4] = contents.accel_std_mps2[1] * contents.accel_std_mps2[1];
+    msg.linear_acceleration_covariance[8] = contents.accel_std_mps2[2] * contents.accel_std_mps2[2];
+
+    msg.angular_velocity.x = contents.gyro_rps[0];
+    msg.angular_velocity.y = contents.gyro_rps[1];
+    msg.angular_velocity.z = contents.gyro_rps[2];
+
+    msg.angular_velocity_covariance[0] = contents.gyro_std_rps[0] * contents.gyro_std_rps[0];
+    msg.angular_velocity_covariance[4] = contents.gyro_std_rps[1] * contents.gyro_std_rps[1];
+    msg.angular_velocity_covariance[8] = contents.gyro_std_rps[2] * contents.gyro_std_rps[2];
     return msg;
   }
 

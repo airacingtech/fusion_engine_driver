@@ -1,5 +1,5 @@
 std_msgs/Header header
-float64[3] accel
-float64[3] accel_std
-float64[3] gyro
-float64[3] gyro_std
+geometry_msgs/Vector3 linear_acceleration
+geometry_msgs/Vector3 angular_velocity
+geometry_msgs/Vector3 linear_acceleration_covariance
+geometry_msgs/Vector3 angular_velocity_covariance
