@@ -239,37 +239,53 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_IMU_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawIMUOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::RawImuOutput msg = populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::RAW_GNSS_ATTITUDE_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawGNSSAttitudeOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::RawGnssAttitudeOutput msg = populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::RAW_WHEEL_TICK_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawWheelTickOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::RawWheelTickOutput msg = populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::RAW_VEHICLE_TICK_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawVehicleTickOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::RawVehicleTickOutput msg = populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::RAW_WHEEL_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawWheelSpeedOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::RawWheelSpeedOutput msg = populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
         break;
       }
     case MessageType::RAW_VEHICLE_SPEED_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawVehicleSpeedOutput *>(payload);
-        kFactory().at(type)(this, &contents);
+        fusion_engine_msgs::msg::RawVehicleSpeedOutput msg = populate(contents);
+        kFactory().at(type)(this, &msg);
         break;
       }
     // ROS Messages
