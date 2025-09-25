@@ -1,5 +1,10 @@
 std_msgs/Header header
-geometry_msgs/Vector3 linear_acceleration
+
+geometry_msgs/Quaternion orientation
+float64[9] orientation_covariance
+
 geometry_msgs/Vector3 angular_velocity
-geometry_msgs/Vector3 linear_acceleration_covariance
-geometry_msgs/Vector3 angular_velocity_covariance
+float64[9] angular_velocity_covariance
+
+geometry_msgs/Vector3 linear_acceleration
+float64[9] linear_acceleration_covariance
