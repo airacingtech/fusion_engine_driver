@@ -34,8 +34,8 @@ def generate_launch_description():
             ('vehicle_speed', '/atlas/vehicle_speed'),
 
             # Raw Sensor Outputs
-            ('raw_imu', '/atlas/imu_raw'),
-            ('raw_gnss_attitude', '/atlas/gnss_attitude_raw'),
+            ('imu_raw', '/atlas/imu_raw'),
+            ('gnss_attitude_raw', '/atlas/gnss_attitude_raw'),
 
             # ROS Wrappers
             ('pose_ros', '/atlas/pose_ros'),

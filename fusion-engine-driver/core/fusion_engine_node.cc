@@ -117,49 +117,49 @@ static const std::unordered_map<MessageType, Factory>& kFactory() {
     // Raw Outputs
     {MessageType::RAW_IMU_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
-      "raw_imu", rclcpp::SensorDataQoS());
+      "imu_raw", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
     }},
     {MessageType::RAW_GNSS_ATTITUDE_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
-      "raw_gnss_attitude", rclcpp::SensorDataQoS());
+      "gnss_attitude_raw", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
     }},
     {MessageType::RAW_WHEEL_TICK_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "raw_wheel_tick", rclcpp::SensorDataQoS());
+      "wheel_tick_raw", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
     }},
     {MessageType::RAW_VEHICLE_TICK_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "raw_vehicle_tick", rclcpp::SensorDataQoS());
+      "vehicle_tick_raw", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
     }},
     {MessageType::RAW_WHEEL_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "raw_wheel_speed", rclcpp::SensorDataQoS());
+      "wheel_speed_raw", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
     }},
     {MessageType::RAW_VEHICLE_SPEED_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<std_msgs::msg::String>(
-      "raw_vehicle_speed", rclcpp::SensorDataQoS());
+      "vehicle_speed_raw", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const std_msgs::msg::String*>(msg));
     }},
 
     // ROS Outputs
     {MessageType::ROS_POSE, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<geometry_msgs::msg::PoseStamped>(
-      "ros_pose", rclcpp::SensorDataQoS());
+      "pose_ros", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const geometry_msgs::msg::PoseStamped*>(msg));
     }},
     {MessageType::ROS_GPS_FIX, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<gps_msgs::msg::GPSFix>(
-      "ros_gpsfix", rclcpp::SensorDataQoS());
+      "gpsfix_ros", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const gps_msgs::msg::GPSFix*>(msg));
     }},
     {MessageType::ROS_IMU, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
-      "ros_imu", rclcpp::SensorDataQoS());
+      "imu_ros", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
     }},
   };
