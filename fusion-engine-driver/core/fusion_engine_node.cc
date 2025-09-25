@@ -176,7 +176,6 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::POSE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage *>(payload);
-        kFactory().at(type)(this, &contents);
       break;
       }
     case MessageType::GNSS_INFO:
@@ -259,28 +258,28 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::ROS_POSE:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::ros::PoseMessage *>(payload);
-        geometry_msgs::msg::PoseStamped pos = ConversionUtils::populate(contents);
-        pos.header.frame_id = frame_id_;
-        pos.header.stamp = time;
-        kFactory().at(type)(this, &pos);
+        geometry_msgs::msg::PoseStamped msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
       break;
       }
     case MessageType::ROS_GPS_FIX:
       {
         auto &contents = *reinterpret_cast<const GPSFixMessage *>(payload);
-        gps_msgs::msg::GPSFix gps_fix = ConversionUtils::populate(contents);
-        gps_fix.header.frame_id = frame_id_;
-        gps_fix.header.stamp = time;
-        kFactory().at(type)(this, &gps_fix);
+        gps_msgs::msg::GPSFix msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
       break;
       }
     case MessageType::ROS_IMU:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::ros::IMUMessage *>(payload);
-        sensor_msgs::msg::Imu imu = ConversionUtils::populate(contents);
-        imu.header.frame_id = frame_id_;
-        imu.header.stamp = time;
-        kFactory().at(type)(this, &imu);
+        sensor_msgs::msg::Imu msg = ConversionUtils::populate(contents);
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
       break;
       }
     default:
