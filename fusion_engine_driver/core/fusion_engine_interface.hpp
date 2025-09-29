@@ -3,6 +3,7 @@
 #include <point_one/fusion_engine/messages/core.h>
 #include <point_one/fusion_engine/messages/ros.h>
 #include <point_one/fusion_engine/parsers/fusion_engine_framer.h>
+#include <point_one/fusion_engine/messages/gnss_corrections.h>
 
 #include <cstdio>
 #include <vector>

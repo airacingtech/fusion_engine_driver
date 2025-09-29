@@ -145,6 +145,11 @@ static const std::unordered_map<MessageType, Factory>& kFactory() {
           "vehicle_speed_raw", rclcpp::SensorDataQoS());
       pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawVehicleSpeedOutput*>(msg));
     }},
+    {MessageType::LBAND_FRAME, [](FusionEngineNode* n, const void* msg) {
+      static auto pub = n->create_publisher<fusion_engine_msgs::msg::LBandFrame>(
+          "lband_frame", rclcpp::SensorDataQoS());
+      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::LBandFrame*>(msg));
+    }},
     // Note: No publisher for RawWheelTickOutput (11123) and RawVehicleTickOutput (11124) in original code
     // ROS Outputs
     {MessageType::ROS_POSE, [](FusionEngineNode* n, const void* msg) {
@@ -316,6 +321,13 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
         fusion_engine_msgs::msg::RawVehicleSpeedOutput msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
+        kFactory().at(type)(this, &msg);
+        break;
+      }
+    case MessageType::LBAND_FRAME:
+      {
+        auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::LBandFrameMessage *>(payload);
+        fusion_engine_msgs::msg::LBandFrame msg = ConversionUtils::populate(contents);
         kFactory().at(type)(this, &msg);
         break;
       }

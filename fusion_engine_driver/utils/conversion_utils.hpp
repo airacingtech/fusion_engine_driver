@@ -1,6 +1,7 @@
 #pragma once
 
 #include <point_one/fusion_engine/messages/ros.h>
+#include <point_one/fusion_engine/messages/gnss_corrections.h>
 
 #include <chrono>
 #include <cmath>
@@ -31,6 +32,7 @@
 #include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
 #include "fusion_engine_msgs/msg/rpy.hpp"
+#include "fusion_engine_msgs/msg/l_band_frame.hpp"
 
 
 class ConversionUtils {
@@ -325,6 +327,19 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
     fusion_engine_msgs::msg::RawVehicleTickOutput msg;
     msg.gear = static_cast<int>(contents.gear);
     msg.tick = contents.tick_count;
+    return msg;
+  }
+
+  static fusion_engine_msgs::msg::LBandFrame populate(const point_one::fusion_engine::messages::LBandFrameMessage& contents) {
+    fusion_engine_msgs::msg::LBandFrame msg;
+
+    msg.system_time.sec  = contents.system_time_ns / 1000000000;
+    msg.system_time.nanosec = contents.system_time_ns % 1000000000;
+
+    msg.size            = contents.user_data_size_bytes;
+    msg.bit_error_count = contents.bit_error_count;
+    msg.signal_power_db = contents.signal_power_db;
+    msg.doppler_hz      = contents.doppler_hz;
     return msg;
   }
 
