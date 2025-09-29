@@ -53,7 +53,7 @@ static fusion_engine_msgs::msg::Pose populate(const point_one::fusion_engine::me
   msg.position_covariance[4] = contents.position_std_enu_m[1] * contents.position_std_enu_m[1];
   msg.position_covariance[8] = contents.position_std_enu_m[2] * contents.position_std_enu_m[2];
 
-  msg.rpy.roll = contents.ypr_deg[2]; msg.rpy.pitch = contents.ypr_deg[1]; msg.rpy.yaw = contents.ypr_deg[0];
+  msg.rpy.roll = contents.ypr_deg[2]; msg.rpy.pitch = contents.ypr_deg[1]; msg.rpy.z = contents.ypr_deg[0];
   msg.rpy_covariance[0] = contents.ypr_std_deg[2] * contents.ypr_std_deg[2];
   msg.rpy_covariance[4] = contents.ypr_std_deg[1] * contents.ypr_std_deg[1];
   msg.rpy_covariance[8] = contents.ypr_std_deg[0] * contents.ypr_std_deg[0];
@@ -267,7 +267,7 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
     msg.linear_acceleration.x = (contents.accel[0] == INT32_MAX) ? NAN
                  : static_cast<double>(contents.accel[0]) / 65536.0;
     msg.linear_acceleration.y = (contents.accel[1] == INT32_MAX) ? NAN
-                 : static_cast<double>(contents.accel[1]) / 65536.0;
+                 : -1.0 * static_cast<double>(contents.accel[1]) / 65536.0;
     msg.linear_acceleration.z = (contents.accel[2] == INT32_MAX) ? NAN
                  : static_cast<double>(contents.accel[2]) / 65536.0;
     
@@ -327,6 +327,7 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
     msg.tick = contents.tick_count;
     return msg;
   }
+
   /***********************************************************************************************************/
   /* ROS Utils */
   static geometry_msgs::msg::PoseStamped populate(const point_one::fusion_engine::messages::ros::PoseMessage& contents) {
