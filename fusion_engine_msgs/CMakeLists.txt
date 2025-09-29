@@ -16,16 +16,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GnssSatelliteInfo.msg"
   "msg/CalibrationStatus.msg"
   "msg/RelativeEnuPosition.msg"
-  "msg/ImuOutput.msg"
   "msg/WheelSpeedOutput.msg"
   "msg/VehicleSpeedOutput.msg"
   "msg/GnssAttitudeOutput.msg"
-  "msg/RawImuOutput.msg"
   "msg/RawWheelSpeedOutput.msg"
   "msg/RawVehicleSpeedOutput.msg"
   "msg/RawWheelTickOutput.msg"
   "msg/RawVehicleTickOutput.msg"
   "msg/RawGnssAttitudeOutput.msg"
+  "msg/RPY.msg"
   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
 )
 

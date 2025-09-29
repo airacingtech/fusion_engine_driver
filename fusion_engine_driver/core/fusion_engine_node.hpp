@@ -27,16 +27,15 @@
 #include "fusion_engine_msgs/msg/gnss_info.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
-#include "fusion_engine_msgs/msg/imu_output.hpp"
 #include "fusion_engine_msgs/msg/gnss_attitude_output.hpp"
 #include "fusion_engine_msgs/msg/wheel_speed_output.hpp"
 #include "fusion_engine_msgs/msg/vehicle_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_gnss_attitude_output.hpp"
-#include "fusion_engine_msgs/msg/raw_imu_output.hpp"
 #include "fusion_engine_msgs/msg/raw_vehicle_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_vehicle_tick_output.hpp"
 #include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
+#include "fusion_engine_msgs/msg/rpy.hpp"
 
 /**
  * @brief Point One Nav Atlas Node publishes realtime GPSFix/IMU/Pose messages.

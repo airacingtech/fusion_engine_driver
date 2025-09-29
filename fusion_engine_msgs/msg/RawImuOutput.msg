@@ -1,5 +1,0 @@
-std_msgs/Header header
-float64 temperature
-
-geometry_msgs/Vector3 angular_velocity
-geometry_msgs/Vector3 linear_acceleration

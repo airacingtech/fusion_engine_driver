@@ -1,30 +1,22 @@
 std_msgs/Header header
-
 fusion_engine_msgs/Timestamp p1_time
 fusion_engine_msgs/Timestamp gps_time
 
 uint8  solution_type
-uint8  flags
-int16  undulation_cm
+int16  undulation
 
-float64 latitude_deg
-float64 longitude_deg
-float64 altitude_m
+float64 latitude
+float64 longitude
+float64 altitude
 
-# ENU position standard deviations [E, N, U]
-float32[3] position_std_enu_m
+float32[9] position_covariance
 
-# Euler-321, degrees [yaw, pitch, roll]
-float64[3] ypr_deg
-float32[3] ypr_std_deg
+fusion_engine_msgs/RPY rpy
+float32[9] rpy_covariance
 
-# Vehicle body-frame velocities [Forward, Left, Up]
-float64[3] velocity_flu_mps
-float32[3] velocity_std_flu_mps
+geometry_msgs/Vector3 velocity_flu
+float32[9] velocity_flu_covariance
 
-float32 aggregate_protection_level_m
-float32 horizontal_protection_level_m
-float32 vertical_protection_level_m
-
-# Flag bits (spec)
-uint8 FLAG_STATIONARY=0x01
+float32 aggregate_protection_level
+float32 horizontal_protection_level
+float32 vertical_protection_level

@@ -116,9 +116,9 @@ static const std::unordered_map<MessageType, Factory>& kFactory() {
 
     // Raw Outputs
     {MessageType::RAW_IMU_OUTPUT, [](FusionEngineNode* n, const void* msg) {
-      static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawImuOutput>(
+      static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
           "imu_raw", rclcpp::SensorDataQoS());
-      pub->publish(*reinterpret_cast<const fusion_engine_msgs::msg::RawImuOutput*>(msg));
+      pub->publish(*reinterpret_cast<const sensor_msgs::msg::Imu*>(msg));
     }},
     {MessageType::RAW_GNSS_ATTITUDE_OUTPUT, [](FusionEngineNode* n, const void* msg) {
       static auto pub = n->create_publisher<fusion_engine_msgs::msg::RawGnssAttitudeOutput>(
@@ -268,7 +268,7 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     case MessageType::RAW_IMU_OUTPUT:
       {
         auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::RawIMUOutput *>(payload);
-        fusion_engine_msgs::msg::RawImuOutput msg = ConversionUtils::populate(contents);
+        sensor_msgs::msg::Imu msg = ConversionUtils::populate(contents);
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);

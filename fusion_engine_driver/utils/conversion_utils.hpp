@@ -22,16 +22,15 @@
 #include "fusion_engine_msgs/msg/gnss_info.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
-#include "fusion_engine_msgs/msg/imu_output.hpp"
 #include "fusion_engine_msgs/msg/gnss_attitude_output.hpp"
 #include "fusion_engine_msgs/msg/wheel_speed_output.hpp"
 #include "fusion_engine_msgs/msg/vehicle_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_gnss_attitude_output.hpp"
-#include "fusion_engine_msgs/msg/raw_imu_output.hpp"
 #include "fusion_engine_msgs/msg/raw_vehicle_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_vehicle_tick_output.hpp"
 #include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
+#include "fusion_engine_msgs/msg/rpy.hpp"
 
 
 class ConversionUtils {
@@ -41,74 +40,61 @@ class ConversionUtils {
   /* Filtered / Navigation Utils */
 static fusion_engine_msgs::msg::Pose populate(const point_one::fusion_engine::messages::PoseMessage& contents) {
   fusion_engine_msgs::msg::Pose msg;
-
   msg.p1_time.seconds     = contents.p1_time.seconds;
   msg.p1_time.fraction_ns = contents.p1_time.fraction_ns;
   msg.gps_time.seconds    = contents.gps_time.seconds;
   msg.gps_time.fraction_ns= contents.gps_time.fraction_ns;
-
   msg.solution_type = static_cast<uint8_t>(contents.solution_type);
-  msg.flags         = contents.flags;
-  msg.undulation_cm = contents.undulation_cm;
 
-  msg.latitude_deg  = contents.lla_deg[0];
-  msg.longitude_deg = contents.lla_deg[1];
-  msg.altitude_m    = contents.lla_deg[2];
+  msg.undulation = contents.undulation_cm * 0.01;
+  msg.latitude  = contents.lla_deg[0]; msg.longitude = contents.lla_deg[1]; msg.altitude  = contents.lla_deg[2];
 
-  msg.position_std_enu_m[0] = contents.position_std_enu_m[0];
-  msg.position_std_enu_m[1] = contents.position_std_enu_m[1];
-  msg.position_std_enu_m[2] = contents.position_std_enu_m[2];
+  msg.position_covariance[0] = contents.position_std_enu_m[0] * contents.position_std_enu_m[0];
+  msg.position_covariance[4] = contents.position_std_enu_m[1] * contents.position_std_enu_m[1];
+  msg.position_covariance[8] = contents.position_std_enu_m[2] * contents.position_std_enu_m[2];
 
-  msg.ypr_deg[0] = contents.ypr_deg[0];
-  msg.ypr_deg[1] = contents.ypr_deg[1];
-  msg.ypr_deg[2] = contents.ypr_deg[2];
+  msg.rpy.roll = contents.ypr_deg[2]; msg.rpy.pitch = contents.ypr_deg[1]; msg.rpy.yaw = contents.ypr_deg[0];
+  msg.rpy_covariance[0] = contents.ypr_std_deg[2] * contents.ypr_std_deg[2];
+  msg.rpy_covariance[4] = contents.ypr_std_deg[1] * contents.ypr_std_deg[1];
+  msg.rpy_covariance[8] = contents.ypr_std_deg[0] * contents.ypr_std_deg[0];
 
-  msg.ypr_std_deg[0] = contents.ypr_std_deg[0];
-  msg.ypr_std_deg[1] = contents.ypr_std_deg[1];
-  msg.ypr_std_deg[2] = contents.ypr_std_deg[2];
+  msg.velocity_flu.x = contents.velocity_body_mps[0]; msg.velocity_flu.y = contents.velocity_body_mps[1]; msg.velocity_flu.z = contents.velocity_body_mps[2];
+  msg.velocity_flu_covariance[0] = contents.velocity_std_body_mps[0] * contents.velocity_std_body_mps[0];
+  msg.velocity_flu_covariance[4] = contents.velocity_std_body_mps[1] * contents.velocity_std_body_mps[1];
+  msg.velocity_flu_covariance[8] = contents.velocity_std_body_mps[2] * contents.velocity_std_body_mps[2];
 
-  msg.velocity_flu_mps[0] = contents.velocity_body_mps[0];
-  msg.velocity_flu_mps[1] = contents.velocity_body_mps[1];
-  msg.velocity_flu_mps[2] = contents.velocity_body_mps[2];
-
-  msg.velocity_std_flu_mps[0] = contents.velocity_std_body_mps[0];
-  msg.velocity_std_flu_mps[1] = contents.velocity_std_body_mps[1];
-  msg.velocity_std_flu_mps[2] = contents.velocity_std_body_mps[2];
-
-  msg.aggregate_protection_level_m  = contents.aggregate_protection_level_m;
-  msg.horizontal_protection_level_m = contents.horizontal_protection_level_m;
-  msg.vertical_protection_level_m   = contents.vertical_protection_level_m;
+  msg.aggregate_protection_level  = contents.aggregate_protection_level_m;
+  msg.horizontal_protection_level  = contents.horizontal_protection_level_m;
+  msg.vertical_protection_level    = contents.vertical_protection_level_m;
 
   return msg;
 }
 
 static fusion_engine_msgs::msg::PoseAux populate(const point_one::fusion_engine::messages::PoseAuxMessage& contents) {
   fusion_engine_msgs::msg::PoseAux msg;
-
   msg.p1_time.seconds      = contents.p1_time.seconds;
   msg.p1_time.fraction_ns  = contents.p1_time.fraction_ns;
 
-  msg.position_std_body_m[0] = contents.position_std_body_m[0];
-  msg.position_std_body_m[1] = contents.position_std_body_m[1];
-  msg.position_std_body_m[2] = contents.position_std_body_m[2];
+  msg.attitude.x = contents.attitude_quaternion[0];
+  msg.attitude.y = contents.attitude_quaternion[1];
+  msg.attitude.z = contents.attitude_quaternion[2];
+  msg.attitude.w = contents.attitude_quaternion[3];
 
-  std::copy(std::begin(contents.position_std_body_m),
-            std::end(contents.position_std_body_m),
-            std::begin(msg.position_std_body_m));
+  msg.velocity_enu.x = contents.velocity_enu_mps[0];
+  msg.velocity_enu.y = contents.velocity_enu_mps[1];
+  msg.velocity_enu.z = contents.velocity_enu_mps[2];
 
-  msg.attitude_quaternion[0] = contents.attitude_quaternion[0];
-  msg.attitude_quaternion[1] = contents.attitude_quaternion[1];
-  msg.attitude_quaternion[2] = contents.attitude_quaternion[2];
-  msg.attitude_quaternion[3] = contents.attitude_quaternion[3];
+  msg.velocity_enu_covariance[0] = contents.velocity_std_enu_mps[0] * contents.velocity_std_enu_mps[0];
+  msg.velocity_enu_covariance[4] = contents.velocity_std_enu_mps[1] * contents.velocity_std_enu_mps[1];
+  msg.velocity_enu_covariance[8] = contents.velocity_std_enu_mps[2] * contents.velocity_std_enu_mps[2];
 
-  msg.velocity_enu_mps[0] = contents.velocity_enu_mps[0];
-  msg.velocity_enu_mps[1] = contents.velocity_enu_mps[1];
-  msg.velocity_enu_mps[2] = contents.velocity_enu_mps[2];
+  msg.position_body_covariance[0] = contents.position_std_body_m[0] * contents.position_std_body_m[0];
+  msg.position_body_covariance[4] = contents.position_std_body_m[1] * contents.position_std_body_m[1];
+  msg.position_body_covariance[8] = contents.position_std_body_m[2] * contents.position_std_body_m[2];
 
-  msg.velocity_std_enu_mps[0] = contents.velocity_std_enu_mps[0];
-  msg.velocity_std_enu_mps[1] = contents.velocity_std_enu_mps[1];
-  msg.velocity_std_enu_mps[2] = contents.velocity_std_enu_mps[2];
-
+  msg.position_enu_covariance[0] = contents.position_cov_enu_m2[0] * contents.position_cov_enu_m2[0];
+  msg.position_enu_covariance[4] = contents.position_cov_enu_m2[4] * contents.position_cov_enu_m2[4];
+  msg.position_enu_covariance[8] = contents.position_cov_enu_m2[8] * contents.position_cov_enu_m2[8];
   return msg;
 }
 
@@ -123,8 +109,8 @@ static fusion_engine_msgs::msg::GnssInfo populate(const point_one::fusion_engine
 
   msg.leap_second     = contents.leap_second;
   msg.num_satellites        = contents.num_svs;
-  msg.corrections_age_decisec = contents.corrections_age * 0.1;
-  msg.baseline_distance_m = contents.baseline_distance * 10;
+  msg.corrections_age = contents.corrections_age * 0.1;
+  msg.baseline_distance = contents.baseline_distance * 10;
   msg.reference_station_id = contents.reference_station_id;
 
   msg.gdop = contents.gdop;
@@ -132,7 +118,7 @@ static fusion_engine_msgs::msg::GnssInfo populate(const point_one::fusion_engine
   msg.hdop = contents.hdop;
   msg.vdop = contents.vdop;
 
-  msg.gps_time_std_dev_s = contents.gps_time_std_sec;
+  msg.gps_time_covariance = contents.gps_time_std_sec * contents.gps_time_std_sec;
 
   return msg;
 }
@@ -142,9 +128,9 @@ static fusion_engine_msgs::msg::GnssSatelliteInfo populate(const point_one::fusi
   fusion_engine_msgs::msg::GnssSatelliteInfo msg;
   msg.prn           = sat.prn;
   msg.constellation = static_cast<uint8_t>(sat.system);
-  msg.cn0_db_hz     = sat.cn0;
-  msg.elevation_deg = sat.elevation_deg;
-  msg.azimuth_deg   = sat.azimuth_deg;
+  msg.cn0           = sat.cn0;
+  msg.elevation     = sat.elevation_deg;
+  msg.azimuth       = sat.azimuth_deg;
   msg.usage         = sat.usage;
   return msg;
 }
@@ -164,31 +150,26 @@ static fusion_engine_msgs::msg::GnssSatellite populate(const point_one::fusion_e
 // Calibration Status
 static fusion_engine_msgs::msg::CalibrationStatus populate(const point_one::fusion_engine::messages::CalibrationStatusMessage& contents) {
   fusion_engine_msgs::msg::CalibrationStatus msg;
-
   msg.p1_time.seconds      = contents.p1_time.seconds;
   msg.p1_time.fraction_ns  = contents.p1_time.fraction_ns;
-
   msg.calibration_stage = static_cast<uint8_t>(contents.calibration_stage);
-
-  msg.ypr_mounting_angle[0] = contents.ypr_deg[0];
-  msg.ypr_mounting_angle[1] = contents.ypr_deg[1];
-  msg.ypr_mounting_angle[2] = contents.ypr_deg[2];
-
-  msg.ypr_std_dev_deg[0] = contents.ypr_std_dev_deg[0];
-  msg.ypr_std_dev_deg[1] = contents.ypr_std_dev_deg[1];
-  msg.ypr_std_dev_deg[2] = contents.ypr_std_dev_deg[2];
-
-  msg.travel_distance_m = contents.travel_distance_m;
   msg.state_verified    = contents.state_verified;
+
+  msg.rpy_mounting.roll = contents.ypr_deg[2]; msg.rpy_mounting.pitch = contents.ypr_deg[1]; msg.rpy_mounting.yaw = contents.ypr_deg[0];
+  msg.rpy_mounting_covariance[2] = contents.ypr_std_dev_deg[2] * contents.ypr_std_dev_deg[2];
+  msg.rpy_mounting_covariance[1] = contents.ypr_std_dev_deg[1] * contents.ypr_std_dev_deg[1];
+  msg.rpy_mounting_covariance[0] = contents.ypr_std_dev_deg[0] * contents.ypr_std_dev_deg[0];
+
+  msg.rpy_max_covariance[2] = contents.mounting_angle_max_std_dev_deg[2] * contents.mounting_angle_max_std_dev_deg[2];
+  msg.rpy_max_covariance[1] = contents.mounting_angle_max_std_dev_deg[1] * contents.mounting_angle_max_std_dev_deg[1];
+  msg.rpy_max_covariance[0] = contents.mounting_angle_max_std_dev_deg[0] * contents.mounting_angle_max_std_dev_deg[0];
+
+  msg.travel_distance = contents.travel_distance_m;
+  msg.min_travel_distance = contents.min_travel_distance_m;
 
   msg.gyro_bias_percent        = contents.gyro_bias_percent_complete * 0.5;
   msg.accel_bias_percent       = contents.accel_bias_percent_complete * 0.5;
   msg.mounting_angle_bias_percent = contents.mounting_angle_percent_complete * 0.5;
-
-  msg.min_travel_distance_m = contents.min_travel_distance_m;
-  msg.max_ypr_std_dev_deg[0] = contents.mounting_angle_max_std_dev_deg[0];
-  msg.max_ypr_std_dev_deg[1] = contents.mounting_angle_max_std_dev_deg[1];
-  msg.max_ypr_std_dev_deg[2] = contents.mounting_angle_max_std_dev_deg[2];
 
   return msg;
 }
@@ -237,53 +218,50 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
     msg.angular_velocity_covariance[0] = contents.gyro_std_rps[0] * contents.gyro_std_rps[0];
     msg.angular_velocity_covariance[4] = contents.gyro_std_rps[1] * contents.gyro_std_rps[1];
     msg.angular_velocity_covariance[8] = contents.gyro_std_rps[2] * contents.gyro_std_rps[2];
+
     return msg;
   }
 
   static fusion_engine_msgs::msg::GnssAttitudeOutput populate(const point_one::fusion_engine::messages::GNSSAttitudeOutput& contents) {
     fusion_engine_msgs::msg::GnssAttitudeOutput msg;
-
     msg.solution_type = static_cast<int>(contents.solution_type);
-    msg.flags         = contents.flags;
 
+    msg.rpy.roll = contents.ypr_deg[2]; msg.rpy.pitch = contents.ypr_deg[1]; msg.rpy.yaw = contents.ypr_deg[0];
+    msg.rpy_covariance[0] = contents.ypr_std_deg[2] * contents.ypr_std_deg[2];
+    msg.rpy_covariance[1] = contents.ypr_std_deg[1] * contents.ypr_std_deg[1];
+    msg.rpy_covariance[2] = contents.ypr_std_deg[0] * contents.ypr_std_deg[0];
 
-    msg.ypr_deg[0] = contents.ypr_deg[0]; msg.ypr_deg[1] = contents.ypr_deg[1]; msg.ypr_deg[2] = contents.ypr_deg[2];
-    msg.ypr_std_deg[0] = contents.ypr_std_deg[0]; msg.ypr_std_deg[1] = contents.ypr_std_deg[1]; msg.ypr_std_deg[2] = contents.ypr_std_deg[2];
-
-    msg.baseline_distance_m      = contents.baseline_distance_m;
-    msg.baseline_distance_std_m  = contents.baseline_distance_std_m;
+    msg.baseline_distance      = contents.baseline_distance_m;
+    msg.baseline_distance_covariance  = contents.baseline_distance_std_m * contents.baseline_distance_std_m;
 
     return msg;
   }
 
   static fusion_engine_msgs::msg::WheelSpeedOutput populate(const point_one::fusion_engine::messages::WheelSpeedOutput& contents) {
     fusion_engine_msgs::msg::WheelSpeedOutput msg;
-
-    msg.front_left_speed  = contents.front_left_speed_mps;
-    msg.front_right_speed = contents.front_right_speed_mps;
-    msg.rear_left_speed   = contents.rear_left_speed_mps;
-    msg.rear_right_speed  = contents.rear_right_speed_mps;
-
     msg.gear  = static_cast<int>(contents.gear);
-    msg.flags = contents.flags;
+
+    msg.fl = contents.front_left_speed_mps;
+    msg.fr = contents.front_right_speed_mps;
+    msg.rl = contents.rear_left_speed_mps;
+    msg.rr = contents.rear_right_speed_mps;
 
     return msg;
   }
 
   static fusion_engine_msgs::msg::VehicleSpeedOutput populate(const point_one::fusion_engine::messages::VehicleSpeedOutput& contents) {
     fusion_engine_msgs::msg::VehicleSpeedOutput msg;
-
-    msg.speed = contents.vehicle_speed_mps;
     msg.gear  = static_cast<int>(contents.gear);
-    msg.flags = contents.flags;
+    
+    msg.speed = contents.vehicle_speed_mps;
 
     return msg;
   }
 
   /***********************************************************************************************************/
   /* Raw Utils */
-  static fusion_engine_msgs::msg::RawImuOutput populate(const point_one::fusion_engine::messages::RawIMUOutput& contents) {
-    fusion_engine_msgs::msg::RawImuOutput msg;
+  static sensor_msgs::msg::Imu populate(const point_one::fusion_engine::messages::RawIMUOutput& contents) {
+    sensor_msgs::msg::Imu msg;
 
     // Convert accel (m/s² * 2^-16)
     msg.linear_acceleration.x = (contents.accel[0] == INT32_MAX) ? NAN
@@ -301,9 +279,6 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
     msg.angular_velocity.z = (contents.gyro[2] == INT32_MAX) ? NAN
                 : static_cast<double>(contents.gyro[2]) / 65536.0;
 
-    // Convert temperature (°C * 2^-7)
-    msg.temperature = (contents.temperature == INT16_MAX) ? NAN
-                      : static_cast<double>(contents.temperature) / 128.0;
     return msg;
     }
 
@@ -311,44 +286,45 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
   static fusion_engine_msgs::msg::RawGnssAttitudeOutput populate(const point_one::fusion_engine::messages::RawGNSSAttitudeOutput& contents) {
     fusion_engine_msgs::msg::RawGnssAttitudeOutput msg;
     msg.solution_type = static_cast<int>(contents.solution_type);
-    msg.flags         = contents.flags;
 
-    msg.relative_position_enu_m.x = contents.relative_position_enu_m[0]; msg.relative_position_enu_m.y = contents.relative_position_enu_m[1]; msg.relative_position_enu_m.z = contents.relative_position_enu_m[2];
-    msg.position_std_enu_m.x = contents.position_std_enu_m[0]; msg.position_std_enu_m.y = contents.position_std_enu_m[1]; msg.position_std_enu_m.z = contents.position_std_enu_m[2];
+    msg.baseline.x = contents.relative_position_enu_m[0]; msg.baseline.y = contents.relative_position_enu_m[1]; msg.baseline.z = contents.relative_position_enu_m[2];
+    msg.baseline_covariance.x = contents.position_std_enu_m[0]; msg.baseline_covariance.y = contents.position_std_enu_m[1]; msg.baseline_covariance.z = contents.position_std_enu_m[2];
     return msg;
   }
   
   static fusion_engine_msgs::msg::RawWheelSpeedOutput populate(const point_one::fusion_engine::messages::RawWheelSpeedOutput& contents) {
     fusion_engine_msgs::msg::RawWheelSpeedOutput msg;
-    msg.front_left_speed  = (contents.front_left_speed  == INT32_MAX) ? NAN : contents.front_left_speed  / 1024.0;
-    msg.front_right_speed = (contents.front_right_speed == INT32_MAX) ? NAN : contents.front_right_speed / 1024.0;
-    msg.rear_left_speed   = (contents.rear_left_speed   == INT32_MAX) ? NAN : contents.rear_left_speed   / 1024.0;
-    msg.rear_right_speed  = (contents.rear_right_speed  == INT32_MAX) ? NAN : contents.rear_right_speed  / 1024.0;
     msg.gear = static_cast<int>(contents.gear);
+
+    msg.fl  = (contents.front_left_speed  == INT32_MAX) ? NAN : contents.front_left_speed  / 1024.0;
+    msg.fr  = (contents.front_right_speed == INT32_MAX) ? NAN : contents.front_right_speed / 1024.0;
+    msg.rl  = (contents.rear_left_speed   == INT32_MAX) ? NAN : contents.rear_left_speed   / 1024.0;
+    msg.rr  = (contents.rear_right_speed  == INT32_MAX) ? NAN : contents.rear_right_speed  / 1024.0;
     return msg;
   }
 
   static fusion_engine_msgs::msg::RawVehicleSpeedOutput populate(const point_one::fusion_engine::messages::RawVehicleSpeedOutput& contents) {
     fusion_engine_msgs::msg::RawVehicleSpeedOutput msg;
-    msg.vehicle_speed = contents.vehicle_speed;
     msg.gear = static_cast<int>(contents.gear);
+
+    msg.speed = contents.vehicle_speed;
     return msg;
   }
 
   static fusion_engine_msgs::msg::RawWheelTickOutput populate(const point_one::fusion_engine::messages::RawWheelTickOutput& contents) {
     fusion_engine_msgs::msg::RawWheelTickOutput msg;
-    msg.front_left_wheel_ticks  = contents.front_left_wheel_ticks;
-    msg.front_right_wheel_ticks = contents.front_right_wheel_ticks;
-    msg.rear_left_wheel_ticks   = contents.rear_left_wheel_ticks;
-    msg.rear_right_wheel_ticks  = contents.rear_right_wheel_ticks;
     msg.gear = static_cast<int>(contents.gear);
+    msg.fl  = contents.front_left_wheel_ticks;
+    msg.fr  = contents.front_right_wheel_ticks;
+    msg.rl  = contents.rear_left_wheel_ticks;
+    msg.rr  = contents.rear_right_wheel_ticks;
     return msg;
   }
   
   static fusion_engine_msgs::msg::RawVehicleTickOutput populate(const point_one::fusion_engine::messages::RawVehicleTickOutput& contents) {
     fusion_engine_msgs::msg::RawVehicleTickOutput msg;
-    msg.tick_count = contents.tick_count;
     msg.gear = static_cast<int>(contents.gear);
+    msg.tick = contents.tick_count;
     return msg;
   }
 
