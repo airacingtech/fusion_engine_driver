@@ -1,4 +1,5 @@
 std_msgs/Header header
 float64 temperature
-float64[3] accel
-float64[3] gyro
+
+geometry_msgs/Vector3 angular_velocity
+geometry_msgs/Vector3 linear_acceleration

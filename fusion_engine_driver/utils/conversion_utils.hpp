@@ -286,19 +286,19 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
     fusion_engine_msgs::msg::RawImuOutput msg;
 
     // Convert accel (m/s² * 2^-16)
-    msg.accel[0] = (contents.accel[0] == INT32_MAX) ? NAN
+    msg.linear_acceleration.x = (contents.accel[0] == INT32_MAX) ? NAN
                  : static_cast<double>(contents.accel[0]) / 65536.0;
-    msg.accel[1] = (contents.accel[1] == INT32_MAX) ? NAN
+    msg.linear_acceleration.y = (contents.accel[1] == INT32_MAX) ? NAN
                  : static_cast<double>(contents.accel[1]) / 65536.0;
-    msg.accel[2] = (contents.accel[2] == INT32_MAX) ? NAN
+    msg.linear_acceleration.z = (contents.accel[2] == INT32_MAX) ? NAN
                  : static_cast<double>(contents.accel[2]) / 65536.0;
     
     // Convert gyro (rad/s * 2^-16)
-    msg.gyro[0] = (contents.gyro[0] == INT32_MAX) ? NAN
+    msg.angular_velocity.x = (contents.gyro[0] == INT32_MAX) ? NAN
                 : static_cast<double>(contents.gyro[0]) / 65536.0;
-    msg.gyro[1] = (contents.gyro[1] == INT32_MAX) ? NAN
+    msg.angular_velocity.y = (contents.gyro[1] == INT32_MAX) ? NAN
                 : static_cast<double>(contents.gyro[1]) / 65536.0;
-    msg.gyro[2] = (contents.gyro[2] == INT32_MAX) ? NAN
+    msg.angular_velocity.z = (contents.gyro[2] == INT32_MAX) ? NAN
                 : static_cast<double>(contents.gyro[2]) / 65536.0;
 
     // Convert temperature (°C * 2^-7)

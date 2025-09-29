@@ -55,12 +55,6 @@ class FusionEngineNode : public rclcpp::Node {
   void receivedFusionEngineMessage(const MessageHeader &header,
                                    const void *payload);
 
-  /**
-   * Translate GPSFix to NavFixMsg
-   * @param gps_fix Atlas gps data point.
-   */
-  void publishNavFixMsg(const gps_msgs::msg::GPSFix &gps_fix);
-
  private:
   /**
    * @brief Interface made to manage the reception of the fusion engines's
