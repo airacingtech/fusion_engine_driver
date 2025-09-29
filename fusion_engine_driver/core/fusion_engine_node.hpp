@@ -36,7 +36,6 @@
 #include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
 #include "fusion_engine_msgs/msg/rpy.hpp"
-#include "fusion_engine_msgs/msg/l_band_frame.hpp"
 
 /**
  * @brief Point One Nav Atlas Node publishes realtime GPSFix/IMU/Pose messages.
