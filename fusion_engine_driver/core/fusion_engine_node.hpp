@@ -144,6 +144,11 @@ private:
   rclcpp::Subscription<mavros_msgs::msg::RTCM>::SharedPtr subscription_;
 
   /**
+   * @brief Number of satellite used for create nmea message.
+   */
+  uint16_t satellite_nb_;
+  
+  /**
    * @brief A smart pointer to a timer object, which allows scheduling periodic
    * callbacks.
    */

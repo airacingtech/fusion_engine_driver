@@ -73,7 +73,6 @@ public:
     msg.position_covariance[8] = contents.position_std_enu_m[2] * contents.position_std_enu_m[2];
 
     msg.rpy.roll = contents.ypr_deg[2]; msg.rpy.pitch = contents.ypr_deg[1];
-    msg.rpy.z = contents.ypr_deg[0];
     msg.rpy_covariance[0] = contents.ypr_std_deg[2] * contents.ypr_std_deg[2];
     msg.rpy_covariance[4] = contents.ypr_std_deg[1] * contents.ypr_std_deg[1];
     msg.rpy_covariance[8] = contents.ypr_std_deg[0] * contents.ypr_std_deg[0];
@@ -280,8 +279,8 @@ public:
     msg.rpy.roll = contents.ypr_deg[2]; msg.rpy.pitch = contents.ypr_deg[1];
     msg.rpy.yaw = contents.ypr_deg[0];
     msg.rpy_covariance[0] = contents.ypr_std_deg[2] * contents.ypr_std_deg[2];
-    msg.rpy_covariance[1] = contents.ypr_std_deg[1] * contents.ypr_std_deg[1];
-    msg.rpy_covariance[2] = contents.ypr_std_deg[0] * contents.ypr_std_deg[0];
+    msg.rpy_covariance[4] = contents.ypr_std_deg[1] * contents.ypr_std_deg[1];
+    msg.rpy_covariance[8] = contents.ypr_std_deg[0] * contents.ypr_std_deg[0];
 
     msg.baseline_distance = contents.baseline_distance_m;
     msg.baseline_distance_covariance = contents.baseline_distance_std_m *

@@ -249,6 +249,7 @@ void FusionEngineNode::receivedFusionEngineMessage(
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::GNSSSatelliteMessage * > (payload);
         fusion_engine_msgs::msg::GnssSatellite msg = ConversionUtils::populate(contents);
+        satellite_nb_ = contents.num_satellites;
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
