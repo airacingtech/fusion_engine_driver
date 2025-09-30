@@ -46,7 +46,7 @@ static fusion_engine_msgs::msg::Pose populate(const point_one::fusion_engine::me
   msg.gps_time.fraction_ns= contents.gps_time.fraction_ns;
   msg.solution_type = static_cast<uint8_t>(contents.solution_type);
 
-  msg.undulation = contents.undulation_cm * 0.01;
+  msg.undulation = contents.undulation_cm;
   msg.latitude  = contents.lla_deg[0]; msg.longitude = contents.lla_deg[1]; msg.altitude  = contents.lla_deg[2];
 
   msg.position_covariance[0] = contents.position_std_enu_m[0] * contents.position_std_enu_m[0];
@@ -92,9 +92,9 @@ static fusion_engine_msgs::msg::PoseAux populate(const point_one::fusion_engine:
   msg.position_body_covariance[4] = contents.position_std_body_m[1] * contents.position_std_body_m[1];
   msg.position_body_covariance[8] = contents.position_std_body_m[2] * contents.position_std_body_m[2];
 
-  msg.position_enu_covariance[0] = contents.position_cov_enu_m2[0] * contents.position_cov_enu_m2[0];
-  msg.position_enu_covariance[4] = contents.position_cov_enu_m2[4] * contents.position_cov_enu_m2[4];
-  msg.position_enu_covariance[8] = contents.position_cov_enu_m2[8] * contents.position_cov_enu_m2[8];
+  msg.position_enu_covariance[0] = contents.position_cov_enu_m2[0];
+  msg.position_enu_covariance[4] = contents.position_cov_enu_m2[4];
+  msg.position_enu_covariance[8] = contents.position_cov_enu_m2[8];
   return msg;
 }
 
@@ -267,7 +267,7 @@ static fusion_engine_msgs::msg::RelativeEnuPosition populate(const point_one::fu
     msg.linear_acceleration.x = (contents.accel[0] == INT32_MAX) ? NAN
                  : static_cast<double>(contents.accel[0]) / 65536.0;
     msg.linear_acceleration.y = (contents.accel[1] == INT32_MAX) ? NAN
-                 : -1.0 * static_cast<double>(contents.accel[1]) / 65536.0;
+                 : static_cast<double>(contents.accel[1]) / 65536.0;
     msg.linear_acceleration.z = (contents.accel[2] == INT32_MAX) ? NAN
                  : static_cast<double>(contents.accel[2]) / 65536.0;
     

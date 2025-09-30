@@ -15,7 +15,7 @@ def generate_launch_description():
     fusion_node = Node(
         package='fusion_engine_driver',
         executable='fusion_engine_ros_driver',
-	    name='fusion_engine_node',
+        name='fusion_engine_node',
         output='screen',
         parameters=[param_file_path],
         remappings=[

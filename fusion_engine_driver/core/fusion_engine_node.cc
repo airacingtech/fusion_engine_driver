@@ -175,11 +175,24 @@ void FusionEngineNode::receivedFusionEngineMessage(const MessageHeader &header,
     // Navigation Solutions
     case MessageType::POSE:
       {
-        auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage *>(payload);
-        fusion_engine_msgs::msg::Pose msg = ConversionUtils::populate(contents);
-        msg.header.frame_id = frame_id_;
-        msg.header.stamp = time;
-        kFactory().at(type)(this, &msg);
+        if (this->get_parameter("connection_type").as_string() == "tty") {
+          auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage *>(payload);
+          double gps_time_sec = contents.gps_time.seconds + contents.gps_time.fraction_ns * 1e-9;
+          if (gps_time_sec - previous_gps_time_sec_ > TIME_BETWEEN_NMEA_UPDATES_SEC_) {
+            nmea_msgs::msg::Sentence nmea = ConversionUtils::toNMEA(contents, satellite_nb_);
+            nmea.header.stamp = this->now();
+            nmea.header.frame_id = "gps";
+            previous_gps_time_sec_ = gps_time_sec;
+            nmea_publisher_->publish(nmea);
+          }
+        }
+        else {
+          auto &contents = *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage *>(payload);
+          fusion_engine_msgs::msg::Pose msg = ConversionUtils::populate(contents);
+          msg.header.frame_id = frame_id_;
+          msg.header.stamp = time;
+          kFactory().at(type)(this, &msg);
+        }
         break;
       }
     case MessageType::GNSS_INFO:
