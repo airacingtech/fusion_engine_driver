@@ -4,7 +4,7 @@
   <version>0.0.1</version>
   <description>Message definitions for Fusion Engine driver</description>
   <maintainer email="d3shin@ucsd.edu">Kevin Shin</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
 
   <!-- Build tools -->
   <buildtool_depend>ament_cmake</buildtool_depend>

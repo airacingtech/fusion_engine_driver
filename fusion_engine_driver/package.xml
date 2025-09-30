@@ -6,7 +6,7 @@
   <description>ROS2 Driver for the Fusion Engine</description>
   <author email="d3shin@ucsd.edu">Kevin Shin</author>
   <maintainer email="d3shin@ucsd.edu">Kevin Shin</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
 
   <depend>fusion_engine_msgs</depend>
 
