@@ -3,7 +3,7 @@ fusion_engine_msgs/Timestamp p1_time
 fusion_engine_msgs/Timestamp gps_time
 
 uint8  solution_type
-float16  undulation
+int16  undulation
 
 float64 latitude
 float64 longitude
