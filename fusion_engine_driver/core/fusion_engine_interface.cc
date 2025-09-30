@@ -65,8 +65,8 @@ void FusionEngineInterface::messageReceived(
   const MessageHeader & header,
   const void * payload_in)
 {
-  // dumpHex(header, payload, MessageType::GNSS_INFO);
   auto payload = static_cast < const uint8_t * > (payload_in);
+  dumpHex(header, payload, MessageType::GNSS_INFO);
   publisher(header, payload);
 }
 
@@ -76,14 +76,20 @@ void FusionEngineInterface::dumpHex(
   MessageType type)
 {
   if (header.message_type == type) {
-    printf("%s Payload (%u bytes):\n", to_string(header.message_type), header.payload_size_bytes);
+    std::ostringstream oss;
+    oss << to_string(header.message_type)
+        << " Payload (" << header.payload_size_bytes << " bytes):\n";
+
     for (uint32_t i = 0; i < header.payload_size_bytes; i++) {
-      printf("%02X ", payload[i]);
+      oss << std::uppercase << std::setfill('0') << std::setw(2)
+          << std::hex << static_cast<int>(payload[i]) << " ";
       if ((i + 1) % 8 == 0) {
-        printf("\n");                                        // 8 Bytes, according to PON Manual.
+        oss << "\n";  // 8 bytes per line
       }
     }
-    printf("\n");
+    oss << "\n";
+
+    RCLCPP_DEBUG(node_->get_logger(), "%s", oss.str().c_str());
   }
 }
 /******************************************************************************/
