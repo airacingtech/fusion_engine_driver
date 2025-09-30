@@ -1,3 +1,17 @@
+// Copyright 2025 AI Racing Tech
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include <cstdint>
@@ -13,8 +27,9 @@
  * data to the listener, and setting a callback function for handling incoming
  * data.
  */
-class DataListener {
- public:
+class DataListener
+{
+public:
   virtual ~DataListener() = default;
 
   /**
@@ -33,7 +48,7 @@ class DataListener {
    * provide additional functionality for stopping the data listener. By
    * default, it simply sets the `running_` flag to false.
    */
-  virtual void stop() { running_ = false; }
+  virtual void stop() {running_ = false;}
 
   /**
    * @brief Writes data to the data listener.
@@ -45,7 +60,7 @@ class DataListener {
    * @param data A pointer to the data buffer to be written.
    * @param size The size of the data buffer in bytes.
    */
-  virtual void write(uint8_t* data, size_t size) = 0;
+  virtual void write(uint8_t * data, size_t size) = 0;
 
   /**
    * @brief Sets a callback function to handle incoming data.
@@ -57,9 +72,9 @@ class DataListener {
    * @param func The callback function to be set.
    */
   virtual void setCallback(
-      const std::function<void(uint8_t*, size_t)>& func) = 0;
+    const std::function<void(uint8_t *, size_t)> & func) = 0;
 
- protected:
+protected:
   bool running_{
-      false};  ///< A flag indicating whether the data listener is running.
+    false};    ///< A flag indicating whether the data listener is running.
 };

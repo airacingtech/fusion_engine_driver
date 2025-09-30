@@ -1,7 +1,22 @@
+// Copyright 2025 AI Racing Tech
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "serial_port.hpp"
 
 /******************************************************************************/
-static constexpr int get_baud(int baud) {
+static constexpr int get_baud(int baud)
+{
   switch (baud) {
     case 9600:
       return B9600;
@@ -45,7 +60,8 @@ static constexpr int get_baud(int baud) {
 }
 
 /******************************************************************************/
-bool SerialPort::Open(const char* device_path, uint32_t baud_rate) {
+bool SerialPort::Open(const char * device_path, uint32_t baud_rate)
+{
   auto baud_enum = get_baud(baud_rate);
 
   if (baud_enum < 0) {
@@ -68,9 +84,9 @@ bool SerialPort::Open(const char* device_path, uint32_t baud_rate) {
   tty.c_cflag &= ~CSIZE;   // Clear all bits that set the data size
   tty.c_cflag |= CS8;      // 8 bits per byte (most common)
   tty.c_cflag &=
-      ~CRTSCTS;  // Disable RTS/CTS hardware flow control (most common)
+    ~CRTSCTS;    // Disable RTS/CTS hardware flow control (most common)
   tty.c_cflag |=
-      CREAD | CLOCAL;  // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+    CREAD | CLOCAL;    // Turn on READ & ignore ctrl lines (CLOCAL = 1)
 
   tty.c_lflag &= ~ICANON;
   tty.c_lflag &= ~ECHO;    // Disable echo
@@ -79,12 +95,12 @@ bool SerialPort::Open(const char* device_path, uint32_t baud_rate) {
   tty.c_lflag &= ~ISIG;    // Disable interpretation of INTR, QUIT and SUSP
   tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // Turn off s/w flow ctrl
   tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR |
-                   ICRNL);  // Disable any special handling of received bytes
+    ICRNL);                 // Disable any special handling of received bytes
 
   tty.c_oflag &= ~OPOST;  // Prevent special interpretation of output bytes
                           // (e.g. newline chars)
   tty.c_oflag &=
-      ~ONLCR;  // Prevent conversion of newline to carriage return/line feed
+    ~ONLCR;    // Prevent conversion of newline to carriage return/line feed
   // tty.c_oflag &= ~OXTABS; // Prevent conversion of tabs to spaces (NOT
   // PRESENT ON LINUX) tty.c_oflag &= ~ONOEOT; // Prevent removal of C-d chars
   // (0x004) in output (NOT PRESENT ON LINUX)
@@ -107,13 +123,15 @@ bool SerialPort::Open(const char* device_path, uint32_t baud_rate) {
 }
 
 /******************************************************************************/
-int SerialPort::Read(void* read_buffer, size_t read_size) {
+int SerialPort::Read(void * read_buffer, size_t read_size)
+{
   // Read bytes. The behaviour of read() (e.g. does it block?,
   // how long does it block for?) depends on the configuration
   // settings above, specifically VMIN and VTIME
   return read(serial_port_, read_buffer, read_size);
 }
 /******************************************************************************/
-int SerialPort::Write(const void* write_buffer, size_t write_size) {
+int SerialPort::Write(const void * write_buffer, size_t write_size)
+{
   return write(serial_port_, write_buffer, write_size);
 }

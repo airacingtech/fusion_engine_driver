@@ -1,9 +1,25 @@
+// Copyright 2025 AI Racing Tech
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include <point_one/fusion_engine/messages/core.h>
 #include <point_one/fusion_engine/messages/ros.h>
 #include <point_one/fusion_engine/parsers/fusion_engine_framer.h>
 
+#include <string>
+#include <memory>
 #include <cstdio>
 #include <vector>
 
@@ -20,7 +36,7 @@ using namespace point_one::fusion_engine::messages::ros;
 /**
  * For payload information and byte ordering, please reference:
  * https://pointonenav.com/wp-content/uploads/2025/08/FusionEngine-Message-Specification-0.23.pdf
- * 
+ *
  * As of 9/1/2025, ROS_IMU payload outputs garbage.
 */
 
@@ -31,16 +47,17 @@ using namespace point_one::fusion_engine::messages::ros;
  * interface.
  *
  */
-class FusionEngineInterface {
- public:
+class FusionEngineInterface
+{
+public:
   /**
    * @brief Construct a new Fusion Engine Interface object
    *
    * @param funcPublisher Receiver for Fusion Engine Message.
    */
   FusionEngineInterface(
-      std::function<void(const MessageHeader& header, const void* payload_in)>
-          funcPublisher);
+    std::function<void(const MessageHeader & header, const void * payload_in)>
+    funcPublisher);
 
   /**
    * @brief Initialize the Fusion Engine interface with the correct type of data
@@ -51,7 +68,7 @@ class FusionEngineInterface {
    * @param tcp_ip The IP address of the TCP server.
    * @param tcp_port The port number used by the server.
    */
-  void initialize(rclcpp::Node* node, const std::string& tcp_ip, int tcp_port);
+  void initialize(rclcpp::Node * node, const std::string & tcp_ip, int tcp_port);
 
   /**
    * @brief Initialize the Fusion Engine interface with the correct type of data
@@ -61,19 +78,19 @@ class FusionEngineInterface {
    * provided by ROS.
    * @param tty_port The targeted serial port.
    */
-  void initialize(rclcpp::Node* node, const std::string& tty_port);
+  void initialize(rclcpp::Node * node, const std::string & tty_port);
 
   /**
    * Callback function for every new parsed message received from Atlas.
    * @param header Metadata on payload.
    * @param payload_in Message received.
    */
-  void messageReceived(const MessageHeader& header, const void* payload_in);
+  void messageReceived(const MessageHeader & header, const void * payload_in);
 
   /**
    * Helper function for dumping raw tcp hex values
    */
-  void dumpHex(const MessageHeader& header, const uint8_t* payload, MessageType type);
+  void dumpHex(const MessageHeader & header, const uint8_t * payload, MessageType type);
 
   /**
    * @brief Call fusion engine decoder.
@@ -81,7 +98,7 @@ class FusionEngineInterface {
    * @param frame Message content.
    * @param bytes_read Message size.
    */
-  void decodeFusionEngineMessage(uint8_t* frame, size_t bytes_read);
+  void decodeFusionEngineMessage(uint8_t * frame, size_t bytes_read);
 
   /**
    * Main service to receive gps data from Atlas.
@@ -95,7 +112,7 @@ class FusionEngineInterface {
    * write.
    * @param size Size of the `data` array.
    */
-  void write(uint8_t* data, size_t size);
+  void write(uint8_t * data, size_t size);
 
   /**
    * @brief Send a signal to stop the listener.
@@ -103,7 +120,7 @@ class FusionEngineInterface {
    */
   void stop();
 
- private:
+private:
   /**
    * @brief Provide a framer for obtaining messages from the data read by
    * a device using Fusion Engine.
@@ -127,8 +144,8 @@ class FusionEngineInterface {
    * @param payload_in A constant void pointer to the input payload.
    *
    */
-  std::function<void(const MessageHeader& header, const void* payload_in)>
-      publisher;
+  std::function<void(const MessageHeader & header, const void * payload_in)>
+  publisher;
 
   /**
    * @brief Pointer to a ROS 2 node for accessing the logging system.
@@ -139,7 +156,7 @@ class FusionEngineInterface {
    * severity.
    *
    */
-  rclcpp::Node* node_;
+  rclcpp::Node * node_;
 
   /**
    * @brief Smart pointer to a data listener interfaces.

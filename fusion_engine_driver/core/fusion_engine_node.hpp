@@ -1,8 +1,27 @@
+// Copyright 2025 AI Racing Tech
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+#ifndef FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_NODE_HPP_
+#define FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_NODE_HPP_
+
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <thread>
 #include <unordered_map>
+#include <string>
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -40,8 +59,9 @@
 /**
  * @brief Point One Nav Atlas Node publishes realtime GPSFix/IMU/Pose messages.
  */
-class FusionEngineNode : public rclcpp::Node {
- public:
+class FusionEngineNode : public rclcpp::Node
+{
+public:
   FusionEngineNode();
   ~FusionEngineNode();
 
@@ -51,10 +71,11 @@ class FusionEngineNode : public rclcpp::Node {
    * @param header Message header with type of message.
    * @param payload Message content
    */
-  void receivedFusionEngineMessage(const MessageHeader &header,
-                                   const void *payload);
+  void receivedFusionEngineMessage(
+    const MessageHeader & header,
+    const void * payload);
 
- private:
+private:
   /**
    * @brief Interface made to manage the reception of the fusion engines's
    * messages.
@@ -71,13 +92,13 @@ class FusionEngineNode : public rclcpp::Node {
    * PoseAux (10003)
    * CalibrationStatus (10004)
    * RelativeENUPosition (10005)
-   * 
+   *
    * Publishers for Calibrated Messages
    * IMUOutput (11000)
    * GNSSAttitudeOutput (11001)
    * WheelSpeedOutput (11135)
    * VehicleSpeedOutput (11136)
-   * 
+   *
    * Publishers for Raw Messages
    * RawIMUOutput (11002)
    * RawGNSSAttitudeOutput (11006)
@@ -127,7 +148,7 @@ class FusionEngineNode : public rclcpp::Node {
    * callbacks.
    */
   rclcpp::TimerBase::SharedPtr timer_;
-  
+
   /**
    * @brief Id of the frame send in ros.
    */
@@ -162,3 +183,5 @@ class FusionEngineNode : public rclcpp::Node {
    */
   void rosServiceLoop();
 };
+
+#endif  // FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_NODE_HPP_

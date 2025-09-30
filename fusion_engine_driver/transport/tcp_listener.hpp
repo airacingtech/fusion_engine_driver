@@ -1,3 +1,17 @@
+// Copyright 2025 AI Racing Tech
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include <netdb.h>       // For gethostbyname() and hostent
@@ -17,8 +31,9 @@
 /**
  * @brief A class for listening to data over TCP/IP.
  */
-class TcpListener : public DataListener {
- public:
+class TcpListener : public DataListener
+{
+public:
   /**
    * @brief Constructs a TcpListener object.
    *
@@ -26,7 +41,7 @@ class TcpListener : public DataListener {
    * @param ip The IP address to listen on.
    * @param port The port number to listen on.
    */
-  TcpListener(rclcpp::Node *node, const std::string &ip, const int &port);
+  TcpListener(rclcpp::Node * node, const std::string & ip, const int & port);
 
   /**
    * @brief Destroys the TcpListener object.
@@ -38,7 +53,7 @@ class TcpListener : public DataListener {
    *
    * @param func The callback function to set.
    */
-  void setCallback(const std::function<void(uint8_t *, size_t)> &func);
+  void setCallback(const std::function<void(uint8_t *, size_t)> & func);
 
   /**
    * @brief Listens for incoming data.
@@ -50,9 +65,9 @@ class TcpListener : public DataListener {
    * @param data A pointer to the data to write.
    * @param size The size of the data to write.
    */
-  void write(uint8_t *data, size_t size);
+  void write(uint8_t * data, size_t size);
 
- private:
+private:
   /**
    * @brief Opens a TCP connection.
    */
@@ -61,7 +76,7 @@ class TcpListener : public DataListener {
   /**
    * @brief A pointer to the ROS2 node for logging.
    */
-  rclcpp::Node *node_;
+  rclcpp::Node * node_;
 
   /**
    * @brief The IP address to listen on.
