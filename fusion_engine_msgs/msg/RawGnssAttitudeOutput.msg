@@ -1,0 +1,5 @@
+std_msgs/Header header
+uint8 solution_type
+
+geometry_msgs/Vector3 baseline
+geometry_msgs/Vector3 baseline_covariance
