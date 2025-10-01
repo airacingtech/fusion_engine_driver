@@ -35,6 +35,8 @@ find_package(visualization_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(nmea_msgs REQUIRED)
 find_package(fusion_engine_msgs REQUIRED)
+find_package(isaac_ros_nitros REQUIRED)
+find_package(isaac_ros_nitros_imu_type REQUIRED)
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -66,6 +68,8 @@ ament_target_dependencies(fusion_engine_ros_driver
   mavros_msgs
   nmea_msgs
   fusion_engine_msgs
+  isaac_ros_nitros
+  isaac_ros_nitros_imu_type
 )
 
 install(TARGETS

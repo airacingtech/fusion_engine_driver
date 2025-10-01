@@ -143,9 +143,19 @@ static const std::unordered_map < MessageType, Factory > & kFactory() {
 
     // Raw Outputs
     {MessageType::RAW_IMU_OUTPUT, [] (FusionEngineNode * n, const void * msg) {
-        static auto pub = n->create_publisher < sensor_msgs::msg::Imu > (
-          "imu_raw", rclcpp::SensorDataQoS());
-        pub->publish(*reinterpret_cast < const sensor_msgs::msg::Imu * > (msg));
+        const auto& contents = *reinterpret_cast<
+      const point_one::fusion_engine::messages::RawIMUOutput *>(msg);
+
+    sensor_msgs::msg::Imu ros_msg = ConversionUtils::populate(contents);
+
+    // Standard ROS2 publisher
+    static auto pub = n->create_publisher<sensor_msgs::msg::Imu>(
+      "imu_raw", rclcpp::SensorDataQoS());
+    pub->publish(ros_msg);
+
+    static auto pub_nitros = n->create_publisher<nvidia::isaac_ros::nitros::NitrosImu>(
+      "imu_raw_nitros", rclcpp::SensorDataQoS());
+    pub_nitros->publish(ros_msg);
       }},
     {MessageType::RAW_GNSS_ATTITUDE_OUTPUT, [] (FusionEngineNode * n, const void * msg) {
         static auto pub = n->create_publisher < fusion_engine_msgs::msg::RawGnssAttitudeOutput > (

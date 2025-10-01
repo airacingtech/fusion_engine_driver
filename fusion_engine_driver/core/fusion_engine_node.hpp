@@ -55,6 +55,13 @@
 #include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
 #include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
 #include "fusion_engine_msgs/msg/rpy.hpp"
+#include "isaac_ros_nitros/nitros_publisher.hpp"
+#include "isaac_ros_nitros_imu_type/nitros_imu.hpp"
+#include "isaac_ros_nitros/nitros_node.hpp"
+
+using nvidia::isaac_ros::nitros::NitrosImu;
+using nvidia::isaac_ros::nitros::NitrosPublisher;
+using nvidia::isaac_ros::nitros::NitrosTypeManager;
 
 /**
  * @brief Point One Nav Atlas Node publishes realtime GPSFix/IMU/Pose messages.
