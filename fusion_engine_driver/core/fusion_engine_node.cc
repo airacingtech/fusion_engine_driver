@@ -117,9 +117,17 @@ static const std::unordered_map < MessageType, Factory > & kFactory() {
 
     // Calibrated Outputs
     {MessageType::IMU_OUTPUT, [] (FusionEngineNode * n, const void * msg) {
+              const auto& contents = *reinterpret_cast<
+      const point_one::fusion_engine::messages::IMUOutput *>(msg);
+
+    sensor_msgs::msg::Imu ros_msg = ConversionUtils::populate(contents);
         static auto pub = n->create_publisher < sensor_msgs::msg::Imu > (
           "imu_calibrated", rclcpp::SensorDataQoS());
-        pub->publish(*reinterpret_cast < const sensor_msgs::msg::Imu * > (msg));
+        pub->publish(ros_msg);
+
+        static auto pub_nitros = n->create_publisher<nvidia::isaac_ros::nitros::NitrosImu>(
+      "imu_calibrated_nitros", rclcpp::SensorDataQoS());
+    pub_nitros->publish(ros_msg);
       }},
     {MessageType::GNSS_ATTITUDE_OUTPUT, [] (FusionEngineNode * n, const void * msg) {
         static auto pub = n->create_publisher < fusion_engine_msgs::msg::GnssAttitudeOutput > (
