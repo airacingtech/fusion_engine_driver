@@ -66,32 +66,9 @@ void FusionEngineInterface::messageReceived(
   const void * payload_in)
 {
   auto payload = static_cast < const uint8_t * > (payload_in);
-  dumpHex(header, payload, MessageType::GNSS_INFO);
   publisher(header, payload);
 }
 
-/******************************************************************************/
-void FusionEngineInterface::dumpHex(
-  const MessageHeader & header, const uint8_t * payload,
-  MessageType type)
-{
-  if (header.message_type == type) {
-    std::ostringstream oss;
-    oss << to_string(header.message_type)
-        << " Payload (" << header.payload_size_bytes << " bytes):\n";
-
-    for (uint32_t i = 0; i < header.payload_size_bytes; i++) {
-      oss << std::uppercase << std::setfill('0') << std::setw(2)
-          << std::hex << static_cast<int>(payload[i]) << " ";
-      if ((i + 1) % 8 == 0) {
-        oss << "\n";  // 8 bytes per line
-      }
-    }
-    oss << "\n";
-
-    RCLCPP_DEBUG(node_->get_logger(), "%s", oss.str().c_str());
-  }
-}
 /******************************************************************************/
 void FusionEngineInterface::decodeFusionEngineMessage(
   uint8_t * frame,

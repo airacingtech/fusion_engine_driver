@@ -23,7 +23,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "conversion_utils.hpp"
+#include "helper.hpp"
 #include "gps_msgs/msg/gps_fix.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -86,11 +86,6 @@ public:
    * @param payload_in Message received.
    */
   void messageReceived(const MessageHeader & header, const void * payload_in);
-
-  /**
-   * Helper function for dumping raw tcp hex values
-   */
-  void dumpHex(const MessageHeader & header, const uint8_t * payload, MessageType type);
 
   /**
    * @brief Call fusion engine decoder.

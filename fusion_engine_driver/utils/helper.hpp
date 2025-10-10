@@ -25,6 +25,7 @@
 #include <map>
 #include <string>
 
+#include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "gps_msgs/msg/gps_fix.hpp"
 #include "mavros_msgs/msg/rtcm.hpp"
@@ -49,7 +50,7 @@
 #include "fusion_engine_msgs/msg/rpy.hpp"
 
 
-class ConversionUtils
+class Helper
 {
 public:
   /***********************************************************************************************************/
@@ -661,4 +662,124 @@ public:
     // map bounds and is equal in time to a specific key.
     return result->second;
   }
+
+
+
+/***********************************************************************************************************/
+  /* SBF Utils */
+  /**
+   * @brief Get a map of SBF block IDs to their corresponding names.
+   *
+   * This function returns a static unordered map that associates SBF block
+   * IDs (uint16_t) with their human-readable names (std::string). The map is
+   * initialized only once and reused on subsequent calls.
+   *
+   * @return A constant reference to the unordered map of SBF block IDs and names.
+   */
+static inline const std::unordered_map<uint16_t, std::string>& getSBFBlockMap() {
+  static const std::unordered_map<uint16_t, std::string> kSBFBlockName = {
+      // ============================================================
+      // Core Measurement Blocks
+      // ============================================================
+      {4027, "MeasEpoch"},
+      {4000, "MeasExtra"},
+      {5922, "EndOfMeas"},
+
+      // ============================================================
+      // PVT (Position, Velocity, Time)
+      // ============================================================
+      {4006, "PVTCartesian"},
+      {4007, "PVTGeodetic"},
+      {5905, "PosCovCartesian"},
+      {5906, "PosCovGeodetic"},
+      {5907, "VelCovCartesian"},
+      {5908, "VelCovGeodetic"},
+      {5921, "EndOfPVT"},
+      {5926, "GEOPRNMask"},
+
+      // ============================================================
+      // Attitude / INS Blocks
+      // ============================================================
+      {5938, "AttEuler"},
+      {5939, "AttCovEuler"},
+      {5897, "AttCovMatrix"},
+      {5942, "AttEuler (legacy)"},
+      {5943, "EndOfAtt"},
+      {5932, "INSNavCart"},
+      {5933, "INSNavGeod"},
+      {5934, "INSNavAtt"},
+      {5929, "IMUSetup"},
+      {5927, "ExtSensorMeas"},
+      {5928, "ExtSensorSetup"},
+
+      // ============================================================
+      // Receiver / Status Information
+      // ============================================================
+      {5902, "ReceiverSetup"},
+      {5911, "xPPSOffset"},
+      {5914, "ReceiverTime"},
+      {5919, "DiffCorrIn"},
+      {4013, "ChannelStatus"},
+      {4014, "ReceiverStatus"},
+      {4053, "NTRIPClientStatus"},
+
+      // ============================================================
+      // GNSS Raw Measurement Blocks
+      // ============================================================
+      {4001, "DOP"},
+      {4020, "GEORawL1"},
+      {4017, "GPSRawL2C"},
+      {4018, "GPSRawL2P"},
+      {4019, "GALRawFNAV"},
+      {4022, "GALRawE5b"},
+      {4023, "GALRawINAV"},
+      {4026, "GLORawCA"},
+      {4030, "QZSSRawL6"},
+      {4031, "QZSSRawL1CA"},
+      {4047, "BDSRaw"},
+      {4120, "BDSIon"},
+      {4218, "BDSRawB1C"},
+      {4219, "BDSRawB2a"},
+
+      // ============================================================
+      // Miscellaneous / Local Frames
+      // ============================================================
+      {4052, "PosLocal"},
+  };
+  return kSBFBlockName;
+}
+
+
+static inline std::string to_string(uint16_t block_id) {
+  const auto& map = getSBFBlockMap();
+  auto it = map.find(block_id);
+  if (it != map.end())
+    return it->second;
+  return "UnknownSBFBlock";
+}
+
+/***********************************************************************************************************/
+/**
+ * @brief Print a block of data in hexadecimal format to the ROS2 logger.
+ *
+ * @param logger The ROS2 logger to use for printing.
+ * @param data Pointer to the block of data to be printed.
+ * @param size Size of the data block in bytes.
+ * @param label A label to prefix the printed data for context.
+ */
+
+static inline void dumpHex(rclcpp::Logger logger, const uint8_t* data, size_t size, const std::string& label) {
+    std::ostringstream oss;
+    oss << label << " (" << size << " bytes):\n";
+
+    for (size_t i = 0; i < size; ++i) {
+        oss << std::setw(2) << std::setfill('0') << std::hex << std::uppercase
+            << static_cast<int>(data[i]) << " ";
+        if ((i + 1) % 8 == 0)
+            oss << "\n";
+    }
+
+    RCLCPP_INFO(logger, "%s", oss.str().c_str());
+}
 };
+
