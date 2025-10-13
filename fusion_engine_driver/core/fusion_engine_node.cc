@@ -52,52 +52,56 @@ struct PVTGeodetic {
 /******************************************************************************/
 FusionEngineNode::FusionEngineNode()
 : Node("fusion_engine_node"),
-  fe_interface_(std::bind(&FusionEngineNode::receivedFusionEngineMessage,
+  fe_interface_(std::bind(&FusionEngineNode::handleFusionMessage,
     this, std::placeholders::_1,
     std::placeholders::_2))
 {
-  this->declare_parameter("udp_port", 12345);
-  this->declare_parameter("connection_type", "tcp");
-  this->declare_parameter("tcp_ip", "localhost");
-  this->declare_parameter("tty_port", "/dev/ttyUSB0");
-  this->declare_parameter("tcp_port", 12345);
-  this->declare_parameter("debug", false);
-  this->declare_parameter("frame_id", "cg");
-  frame_id_ = this->get_parameter("frame_id").as_string();
-  timer_ =
-    create_wall_timer(
+  connection_type_ = declare_parameter("connection_type", "tcp");
+  ip_ = declare_parameter("ip", "localhost");
+  port_ = declare_parameter("port", 30200);
+  device_ = declare_parameter("device", "/dev/ttyUSB0");
+  debug_ = declare_parameter("debug", false);
+  frame_id_ = declare_parameter("frame_id", "cg");
+  timer_ = create_wall_timer(
     std::chrono::milliseconds(1),
     std::bind(&FusionEngineNode::rosServiceLoop, this));
 
-  if (this->has_parameter("connection_type")) {
-    std::string argValue(this->get_parameter("connection_type").as_string());
-    if (argValue == "tcp") {
-      fe_interface_.initialize(
-        this, this->get_parameter("tcp_ip").as_string(),
-        this->get_parameter("tcp_port").as_int());
-      dataListenerService();
-    } else if (argValue == "tty") {
+  try {
+    RCLCPP_INFO(get_logger(), "Initializing FusionEngineNode...");
+    RCLCPP_INFO(get_logger(), "Connection type: %s", connection_type_.c_str());
+
+    if (connection_type_ == "tty") {
+      RCLCPP_INFO(get_logger(), "Device: %s", device_.c_str());
+
       nmea_publisher_ = this->create_publisher < nmea_msgs::msg::Sentence > (
         "ntrip_client/nmea", 10);
       subscription_ = this->create_subscription < mavros_msgs::msg::RTCM > (
         "ntrip_client/rtcm", 10,
         [this](const mavros_msgs::msg::RTCM::SharedPtr msg) {
-        if (this->get_parameter("debug").as_bool()) {
+        if (this->debug_) {
           RCLCPP_INFO(this->get_logger(), "RTCM message received.");
         }
         fe_interface_.write(msg->data.data(), msg->data.size());
       });
-      fe_interface_.initialize(
-        this,
-        this->get_parameter("tty_port").as_string());
-      listener_thread_ =
-        std::thread(std::bind(&FusionEngineNode::dataListenerService, this));
+
+      fe_interface_.initialize(this, device_);
+      listener_thread_ = std::thread(
+        std::bind(&FusionEngineNode::dataListenerService, this));
+
+    } else if (connection_type_ == "tcp" || connection_type_ == "udp") {
+      RCLCPP_INFO(get_logger(), "IP: %s", ip_.c_str());
+      RCLCPP_INFO(get_logger(), "Port: %d", port_);
+
+      fe_interface_.initialize(this, ip_, port_);
+      dataListenerService();
     } else {
-      std::cout << "Invalid args" << std::endl;
+      RCLCPP_ERROR(get_logger(), "Invalid connection type: %s", connection_type_.c_str());
       rclcpp::shutdown();
+      return;
     }
-  } else {
-    std::cout << "Invalid args" << std::endl;
+
+  } catch (const std::exception & e) {
+    RCLCPP_ERROR(get_logger(), "Error initializing FusionEngineNode: %s", e.what());
     rclcpp::shutdown();
   }
 }
@@ -238,7 +242,7 @@ static const std::unordered_map < MessageType, Factory > & kFactory() {
 }
 
 /******************************************************************************/
-void FusionEngineNode::receivedFusionEngineMessage(
+void FusionEngineNode::handleFusionMessage(
   const MessageHeader & header,
   const void * payload)
 {
@@ -471,14 +475,14 @@ void FusionEngineNode::receivedFusionEngineMessage(
 
       uint16_t block_num = block_id & 0x1FFF;     // bits 0–12
       uint8_t  revision  = (block_id >> 13) & 0x7;// bits 13–15
-      if(block_num == 4007){
-        const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
-RCLCPP_INFO(get_logger(), "Lat: %.8f, Lon: %.8f, Height: %.3f, Vn: %.3f, Ve: %.3f",
-            pvt->latitude, pvt->longitude, pvt->height, pvt->vn, pvt->ve);
-      }
-    //   RCLCPP_INFO(this->get_logger(),
-    // "SBF block detected: ID=0x%04X (%s, rev=%u), length=%u, CRC=0x%04X",
-    // block_id, Helper::to_string(block_num).c_str(), revision, length, crc);
+//       if(block_num == 4007){
+//         const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
+// RCLCPP_INFO(get_logger(), "Lat: %.8f, Lon: %.8f, Height: %.3f, Vn: %.3f, Ve: %.3f",
+//             pvt->latitude, pvt->longitude, pvt->height, pvt->vn, pvt->ve);
+//       }
+       RCLCPP_INFO(this->get_logger(),
+     "SBF block detected: ID=0x%04X (%s, rev=%u), length=%u, CRC=0x%04X",
+     block_id, Helper::to_string(block_num).c_str(), revision, length, crc);
     }
     //Helper::dumpHex(this->get_logger(), header, inner_size, "SBF Payload");
   }

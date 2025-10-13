@@ -80,7 +80,6 @@ void FusionEngineInterface::decodeFusionEngineMessage(
 /******************************************************************************/
 void FusionEngineInterface::dataListenerService()
 {
-  RCLCPP_INFO(node_->get_logger(), "Start listening using connection_type");
   data_listener_->listen();
 }
 

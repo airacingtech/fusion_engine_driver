@@ -688,6 +688,8 @@ static inline const std::unordered_map<uint16_t, std::string>& getSBFBlockMap() 
       // ============================================================
       // PVT (Position, Velocity, Time)
       // ============================================================
+      {4003, "PVTInfo"},
+      {4002, "PVTCartesian"},
       {4006, "PVTCartesian"},
       {4007, "PVTGeodetic"},
       {5905, "PosCovCartesian"},
@@ -736,6 +738,7 @@ static inline const std::unordered_map<uint16_t, std::string>& getSBFBlockMap() 
       {4026, "GLORawCA"},
       {4030, "QZSSRawL6"},
       {4031, "QZSSRawL1CA"},
+      {4032, "BaseStationInfo"},
       {4047, "BDSRaw"},
       {4120, "BDSIon"},
       {4218, "BDSRawB1C"},
