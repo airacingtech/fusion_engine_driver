@@ -23,7 +23,22 @@
 #include <cstdio>
 #include <vector>
 
-#include "fusion_driver_msgs.hpp"
+#include "std_msgs/msg/string.hpp"
+
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
+#include "sensor_msgs/msg/nav_sat_status.hpp"
+
+#include "gps_msgs/msg/gps_status.hpp"
+
+#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "mavros_msgs/msg/rtcm.hpp"
+#include "nmea_msgs/msg/sentence.hpp"
+
+#include "navigation_msgs.hpp"
+#include "calibrated_msgs.hpp"
+#include "raw_msgs.hpp"
+#include "ros_msgs.hpp"
+
 #include "helper.hpp"
 #include "gps_msgs/msg/gps_fix.hpp"
 #include "rclcpp/rclcpp.hpp"

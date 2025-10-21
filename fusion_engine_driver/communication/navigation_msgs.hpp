@@ -21,6 +21,7 @@
 #include "fusion_engine_msgs/msg/relative_enu_position.hpp"
 #include "fusion_engine_msgs/msg/gnss_info.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite.hpp"
+#include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
 
 /* ========================================================================== */
 /*  FILTERED / NAVIGATION CONVERTERS                                          */
@@ -28,6 +29,7 @@
 /*  FusionEngine messages → ROS 2 messages.                                  */
 /* ========================================================================== */
 
+namespace navigation_msgs {
 struct Pose : public fusion_engine_msgs::msg::Pose {
   inline explicit Pose(const point_one::fusion_engine::messages::PoseMessage& p) {
     p1_time.seconds = p.p1_time.seconds;
@@ -52,20 +54,19 @@ struct Pose : public fusion_engine_msgs::msg::Pose {
     rpy_covariance[4] = p.ypr_std_deg[1] * p.ypr_std_deg[1];
     rpy_covariance[8] = p.ypr_std_deg[0] * p.ypr_std_deg[0];
 
-    velocity_flu.x = p.velocity_body_mps[0];
-    velocity_flu.y = p.velocity_body_mps[1];
-    velocity_flu.z = p.velocity_body_mps[2];
+    velflu.x = p.velocity_body_mps[0];
+    velflu.y = p.velocity_body_mps[1];
+    velflu.z = p.velocity_body_mps[2];
 
-    velocity_flu_covariance[0] = p.velocity_std_body_mps[0] * p.velocity_std_body_mps[0];
-    velocity_flu_covariance[4] = p.velocity_std_body_mps[1] * p.velocity_std_body_mps[1];
-    velocity_flu_covariance[8] = p.velocity_std_body_mps[2] * p.velocity_std_body_mps[2];
+    velflu_covariance[0] = p.velocity_std_body_mps[0] * p.velocity_std_body_mps[0];
+    velflu_covariance[4] = p.velocity_std_body_mps[1] * p.velocity_std_body_mps[1];
+    velflu_covariance[8] = p.velocity_std_body_mps[2] * p.velocity_std_body_mps[2];
 
     aggregate_protection_level  = p.aggregate_protection_level_m;
     horizontal_protection_level = p.horizontal_protection_level_m;
     vertical_protection_level   = p.vertical_protection_level_m;
   }
 };
-
 
 struct PoseAux : public fusion_engine_msgs::msg::PoseAux {
   inline explicit PoseAux(const point_one::fusion_engine::messages::PoseAuxMessage& p) {
@@ -77,24 +78,23 @@ struct PoseAux : public fusion_engine_msgs::msg::PoseAux {
     attitude.z = p.attitude_quaternion[2];
     attitude.w = p.attitude_quaternion[3];
 
-    velocity_enu.x = p.velocity_enu_mps[0];
-    velocity_enu.y = p.velocity_enu_mps[1];
-    velocity_enu.z = p.velocity_enu_mps[2];
+    velenu.x = p.velocity_enu_mps[0];
+    velenu.y = p.velocity_enu_mps[1];
+    velenu.z = p.velocity_enu_mps[2];
 
-    velocity_enu_covariance[0] = p.velocity_std_enu_mps[0] * p.velocity_std_enu_mps[0];
-    velocity_enu_covariance[4] = p.velocity_std_enu_mps[1] * p.velocity_std_enu_mps[1];
-    velocity_enu_covariance[8] = p.velocity_std_enu_mps[2] * p.velocity_std_enu_mps[2];
+    velenu_covariance[0] = p.velocity_std_enu_mps[0] * p.velocity_std_enu_mps[0];
+    velenu_covariance[1] = p.velocity_std_enu_mps[1] * p.velocity_std_enu_mps[1];
+    velenu_covariance[2] = p.velocity_std_enu_mps[2] * p.velocity_std_enu_mps[2];
 
-    position_body_covariance[0] = p.position_std_body_m[0] * p.position_std_body_m[0];
-    position_body_covariance[4] = p.position_std_body_m[1] * p.position_std_body_m[1];
-    position_body_covariance[8] = p.position_std_body_m[2] * p.position_std_body_m[2];
+    posbody_covariance[0] = p.position_std_body_m[0] * p.position_std_body_m[0];
+    posbody_covariance[1] = p.position_std_body_m[1] * p.position_std_body_m[1];
+    posbody_covariance[2] = p.position_std_body_m[2] * p.position_std_body_m[2];
 
-    position_enu_covariance[0] = p.position_cov_enu_m2[0];
-    position_enu_covariance[4] = p.position_cov_enu_m2[4];
-    position_enu_covariance[8] = p.position_cov_enu_m2[8];
+    posenu_covariance[0] = p.position_cov_enu_m2[0];
+    posenu_covariance[1] = p.position_cov_enu_m2[4];
+    posenu_covariance[2] = p.position_cov_enu_m2[8];
   }
-};
-
+}; 
 
 struct GnssInfo : public fusion_engine_msgs::msg::GnssInfo {
   inline explicit GnssInfo(const point_one::fusion_engine::messages::GNSSInfoMessage& p) {
@@ -118,7 +118,6 @@ struct GnssInfo : public fusion_engine_msgs::msg::GnssInfo {
   }
 };
 
-
 struct GnssSatelliteInfo : public fusion_engine_msgs::msg::GnssSatelliteInfo {
   inline explicit GnssSatelliteInfo(const point_one::fusion_engine::messages::SatelliteInfo& sat) {
     prn = sat.prn;
@@ -130,7 +129,6 @@ struct GnssSatelliteInfo : public fusion_engine_msgs::msg::GnssSatelliteInfo {
   }
 };
 
-
 struct GnssSatellite : public fusion_engine_msgs::msg::GnssSatellite {
   inline explicit GnssSatellite(const point_one::fusion_engine::messages::GNSSSatelliteMessage& p) {
     p1_time.seconds = p.p1_time.seconds;
@@ -141,7 +139,6 @@ struct GnssSatellite : public fusion_engine_msgs::msg::GnssSatellite {
     num_satellites = p.num_satellites;
   }
 };
-
 
 struct CalibrationStatus : public fusion_engine_msgs::msg::CalibrationStatus {
   inline explicit CalibrationStatus(const point_one::fusion_engine::messages::CalibrationStatusMessage& p) {
@@ -171,7 +168,6 @@ struct CalibrationStatus : public fusion_engine_msgs::msg::CalibrationStatus {
   }
 };
 
-
 struct RelativeEnuPosition : public fusion_engine_msgs::msg::RelativeEnuPosition {
   inline explicit RelativeEnuPosition(const point_one::fusion_engine::messages::RelativeENUPositionMessage& p) {
     p1_time.seconds = p.p1_time.seconds;
@@ -182,14 +178,16 @@ struct RelativeEnuPosition : public fusion_engine_msgs::msg::RelativeEnuPosition
     solution_type = static_cast<uint8_t>(p.solution_type);
     reference_station_id = p.reference_station_id;
 
-    east_m  = p.relative_position_enu_m[0];
-    north_m = p.relative_position_enu_m[1];
-    up_m    = p.relative_position_enu_m[2];
+    east  = p.relative_position_enu_m[0];
+    north = p.relative_position_enu_m[1];
+    up    = p.relative_position_enu_m[2];
 
-    east_std_m  = p.position_std_enu_m[0];
-    north_std_m = p.position_std_enu_m[1];
-    up_std_m    = p.position_std_enu_m[2];
+    enu_covariance[0] = p.position_std_enu_m[0] * p.position_std_enu_m[0];
+    enu_covariance[1] = p.position_std_enu_m[1] * p.position_std_enu_m[1];
+    enu_covariance[2] = p.position_std_enu_m[2] * p.position_std_enu_m[2];
+
   }
 };
 
+}  // namespace navigation_msgs
 #endif // FUSION_ENGINE_DRIVER__COMMUNICATION__NAVIGATION_MSGS_HPP_

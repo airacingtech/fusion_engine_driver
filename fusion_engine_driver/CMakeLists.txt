@@ -59,7 +59,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/transport/serial_port.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/transport/tcp_listener.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/transport/tty_listener.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/communication/fusion_driver_msgs.hpp
     )
 
 add_executable(fusion_engine_ros_driver ${SRC})

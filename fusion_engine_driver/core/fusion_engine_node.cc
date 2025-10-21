@@ -267,7 +267,7 @@ void FusionEngineNode::handleFusionMessage(
         } else {
           auto & contents = *reinterpret_cast <
             const point_one::fusion_engine::messages::PoseMessage * > (payload);
-          fusion_engine_msgs::msg::Pose msg = Helper::populate(contents);
+          navigation_msgs::Pose msg{contents};
           msg.header.frame_id = frame_id_;
           msg.header.stamp = time;
           kFactory().at(type)(this, &msg);
@@ -278,7 +278,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::GNSSInfoMessage * > (payload);
-        fusion_engine_msgs::msg::GnssInfo msg = Helper::populate(contents);
+        navigation_msgs::GnssInfo msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -288,7 +288,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::GNSSSatelliteMessage * > (payload);
-        fusion_engine_msgs::msg::GnssSatellite msg = Helper::populate(contents);
+        navigation_msgs::GnssSatellite msg{contents};
         satellite_nb_ = contents.num_satellites;
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
@@ -299,7 +299,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::PoseAuxMessage * > (payload);
-        fusion_engine_msgs::msg::PoseAux msg = Helper::populate(contents);
+        navigation_msgs::PoseAux msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -309,7 +309,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::CalibrationStatusMessage * > (payload);
-        fusion_engine_msgs::msg::CalibrationStatus msg = Helper::populate(contents);
+        navigation_msgs::CalibrationStatus msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -319,7 +319,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::RelativeENUPositionMessage * > (payload);
-        fusion_engine_msgs::msg::RelativeEnuPosition msg = Helper::populate(contents);
+        navigation_msgs::RelativeEnuPosition msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -330,7 +330,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::IMUOutput * > (payload);
-        sensor_msgs::msg::Imu msg = Helper::populate(contents);
+        calibrated_msgs::Imu msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -340,7 +340,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::GNSSAttitudeOutput * > (payload);
-        fusion_engine_msgs::msg::GnssAttitudeOutput msg = Helper::populate(contents);
+        calibrated_msgs::GnssAttitudeOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -350,7 +350,8 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::WheelSpeedOutput * > (payload);
-        fusion_engine_msgs::msg::WheelSpeedOutput msg = Helper::populate(contents);
+
+        calibrated_msgs::WheelSpeedOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -360,7 +361,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::VehicleSpeedOutput * > (payload);
-        fusion_engine_msgs::msg::VehicleSpeedOutput msg = Helper::populate(contents);
+        calibrated_msgs::VehicleSpeedOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -371,7 +372,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::RawIMUOutput * > (payload);
-        sensor_msgs::msg::Imu msg = Helper::populate(contents);
+        raw_msgs::RawImu msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -381,7 +382,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::RawGNSSAttitudeOutput * > (payload);
-        fusion_engine_msgs::msg::RawGnssAttitudeOutput msg = Helper::populate(contents);
+        raw_msgs::RawGnssAttitudeOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -391,7 +392,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::RawWheelTickOutput * > (payload);
-        fusion_engine_msgs::msg::RawWheelTickOutput msg = Helper::populate(contents);
+        raw_msgs::RawWheelTickOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -401,7 +402,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::RawVehicleTickOutput * > (payload);
-        fusion_engine_msgs::msg::RawVehicleTickOutput msg = Helper::populate(contents);
+        raw_msgs::RawVehicleTickOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -411,7 +412,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::RawWheelSpeedOutput * > (payload);
-        fusion_engine_msgs::msg::RawWheelSpeedOutput msg = Helper::populate(contents);
+        raw_msgs::RawWheelSpeedOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -421,7 +422,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::RawVehicleSpeedOutput * > (payload);
-        fusion_engine_msgs::msg::RawVehicleSpeedOutput msg = Helper::populate(contents);
+        raw_msgs::RawVehicleSpeedOutput msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -432,7 +433,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::ros::PoseMessage * > (payload);
-        geometry_msgs::msg::PoseStamped msg = Helper::populate(contents);
+        ros_msgs::Pose msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -441,7 +442,7 @@ void FusionEngineNode::handleFusionMessage(
     case MessageType::ROS_GPS_FIX:
       {
         auto & contents = *reinterpret_cast < const GPSFixMessage * > (payload);
-        gps_msgs::msg::GPSFix msg = Helper::populate(contents);
+        ros_msgs::GPSFix msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
@@ -451,7 +452,7 @@ void FusionEngineNode::handleFusionMessage(
       {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::ros::IMUMessage * > (payload);
-        sensor_msgs::msg::Imu msg = Helper::populate(contents);
+        ros_msgs::Imu msg{contents};
         msg.header.frame_id = frame_id_;
         msg.header.stamp = time;
         kFactory().at(type)(this, &msg);
