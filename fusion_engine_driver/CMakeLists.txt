@@ -20,7 +20,16 @@ FetchContent_Declare(
     GIT_REPOSITORY git@github.com:airacingtech/fusion-engine-client.git
     GIT_TAG origin/master
 )
+
+FetchContent_Declare(
+  septentrio_gnss_driver
+  GIT_REPOSITORY https://github.com/septentrio-gnss/septentrio_gnss_driver.git
+  GIT_TAG master           # or a specific release/tag (e.g. ros2 or iron branch)
+  GIT_SHALLOW TRUE       # optional but speeds up fetch
+)
+
 FetchContent_Populate(fusion_engine_client)
+FetchContent_Populate(septentrio_gnss_driver)
 add_subdirectory(${fusion_engine_client_SOURCE_DIR} ${fusion_engine_client_BINARY_DIR})
 
 # find dependencies
@@ -40,16 +49,17 @@ find_package(fusion_engine_msgs REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-include_directories(./core ./utils ./transport)
+include_directories(./core ./utils ./transport ./communication)
 
 set(SRC
     ${SOURCE}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/main.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/core/fusion_engine_node.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/core/fusion_engine_interface.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/transport/serial_port.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/transport/tcp_listener.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/transport/tty_listener.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/communication/fusion_driver_msgs.hpp
     )
 
 add_executable(fusion_engine_ros_driver ${SRC})

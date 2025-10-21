@@ -246,6 +246,7 @@ void FusionEngineNode::handleFusionMessage(
   const MessageHeader & header,
   const void * payload)
 {
+  StatusResult status{Errors::noError};
   auto time = now();
   auto type = header.message_type;
   switch (type) {
@@ -475,14 +476,19 @@ void FusionEngineNode::handleFusionMessage(
 
       uint16_t block_num = block_id & 0x1FFF;     // bits 0–12
       uint8_t  revision  = (block_id >> 13) & 0x7;// bits 13–15
-//       if(block_num == 4007){
-//         const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
-// RCLCPP_INFO(get_logger(), "Lat: %.8f, Lon: %.8f, Height: %.3f, Vn: %.3f, Ve: %.3f",
-//             pvt->latitude, pvt->longitude, pvt->height, pvt->vn, pvt->ve);
-//       }
-       RCLCPP_INFO(this->get_logger(),
-     "SBF block detected: ID=0x%04X (%s, rev=%u), length=%u, CRC=0x%04X",
-     block_id, Helper::to_string(block_num).c_str(), revision, length, crc);
+      if(block_num == 4007){
+        const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
+RCLCPP_INFO(get_logger(), "Lat: %.8f, Lon: %.8f, Height: %.3f, Vn: %.3f, Ve: %.3f",
+            pvt->latitude, pvt->longitude, pvt->height, pvt->vn, pvt->ve);
+      }
+      if(Helper::to_string(block_num) == "UnknownSBFBlock"){
+        RCLCPP_WARN(this->get_logger(),
+          "Unknown SBF block detected: ID=0x%04X, length=%u, CRC=0x%04X",
+          block_id, length, crc);
+      }
+    //    RCLCPP_INFO(this->get_logger(),
+    //  "SBF block detected: ID=0x%04X (%s, rev=%u), length=%u, CRC=0x%04X",
+    //  block_id, Helper::to_string(block_num).c_str(), revision, length, crc);
     }
     //Helper::dumpHex(this->get_logger(), header, inner_size, "SBF Payload");
   }

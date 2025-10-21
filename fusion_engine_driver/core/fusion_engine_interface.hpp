@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <vector>
 
+#include "fusion_driver_msgs.hpp"
 #include "helper.hpp"
 #include "gps_msgs/msg/gps_fix.hpp"
 #include "rclcpp/rclcpp.hpp"

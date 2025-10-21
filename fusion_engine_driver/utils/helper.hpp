@@ -684,6 +684,12 @@ static inline const std::unordered_map<uint16_t, std::string>& getSBFBlockMap() 
       {4027, "MeasEpoch"},
       {4000, "MeasExtra"},
       {5922, "EndOfMeas"},
+      {5891, "GPSNav"},
+      {5893, "GPSIonoParams"},
+      {5894, "GPSUtc"},
+      {5896, "GALTime"},
+      {5930, "IMUData"},
+      {5931, "IMUStatus"},
 
       // ============================================================
       // PVT (Position, Velocity, Time)
@@ -736,8 +742,11 @@ static inline const std::unordered_map<uint16_t, std::string>& getSBFBlockMap() 
       {4022, "GALRawE5b"},
       {4023, "GALRawINAV"},
       {4026, "GLORawCA"},
+      {4036, "GLOTime"},
+
       {4030, "QZSSRawL6"},
       {4031, "QZSSRawL1CA"},
+      
       {4032, "BaseStationInfo"},
       {4047, "BDSRaw"},
       {4120, "BDSIon"},
@@ -755,7 +764,8 @@ static inline const std::unordered_map<uint16_t, std::string>& getSBFBlockMap() 
 
 static inline std::string to_string(uint16_t block_id) {
   const auto& map = getSBFBlockMap();
-  auto it = map.find(block_id);
+  uint16_t block_num = block_id & 0x1FFF;
+  auto it = map.find(block_num);
   if (it != map.end())
     return it->second;
   return "UnknownSBFBlock";

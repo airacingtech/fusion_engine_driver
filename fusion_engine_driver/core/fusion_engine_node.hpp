@@ -24,37 +24,40 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-
-#include "std_msgs/msg/string.hpp"
-
-#include "sensor_msgs/msg/imu.hpp"
-#include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include "sensor_msgs/msg/nav_sat_status.hpp"
-
-#include "gps_msgs/msg/gps_fix.hpp"
-#include "gps_msgs/msg/gps_status.hpp"
-
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "mavros_msgs/msg/rtcm.hpp"
-#include "nmea_msgs/msg/sentence.hpp"
-
 #include "fusion_engine_interface.hpp"
-#include "fusion_engine_msgs/msg/pose.hpp"
-#include "fusion_engine_msgs/msg/pose_aux.hpp"
-#include "fusion_engine_msgs/msg/calibration_status.hpp"
-#include "fusion_engine_msgs/msg/relative_enu_position.hpp"
-#include "fusion_engine_msgs/msg/gnss_info.hpp"
-#include "fusion_engine_msgs/msg/gnss_satellite.hpp"
-#include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
-#include "fusion_engine_msgs/msg/gnss_attitude_output.hpp"
-#include "fusion_engine_msgs/msg/wheel_speed_output.hpp"
-#include "fusion_engine_msgs/msg/vehicle_speed_output.hpp"
-#include "fusion_engine_msgs/msg/raw_gnss_attitude_output.hpp"
-#include "fusion_engine_msgs/msg/raw_vehicle_speed_output.hpp"
-#include "fusion_engine_msgs/msg/raw_vehicle_tick_output.hpp"
-#include "fusion_engine_msgs/msg/raw_wheel_speed_output.hpp"
-#include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
-#include "fusion_engine_msgs/msg/rpy.hpp"
+#include "errors.hpp"
+
+// #include <septentrio_gnss_driver/msg/aim_plus_status.hpp>
+// #include <septentrio_gnss_driver/msg/att_cov_euler.hpp>
+// #include <septentrio_gnss_driver/msg/att_euler.hpp>
+// #include <septentrio_gnss_driver/msg/base_vector_cart.hpp>
+// #include <septentrio_gnss_driver/msg/base_vector_geod.hpp>
+// #include <septentrio_gnss_driver/msg/block_header.hpp>
+// #include <septentrio_gnss_driver/msg/gal_auth_status.hpp>
+// #include <septentrio_gnss_driver/msg/meas_epoch.hpp>
+// #include <septentrio_gnss_driver/msg/meas_epoch_channel_type1.hpp>
+// #include <septentrio_gnss_driver/msg/meas_epoch_channel_type2.hpp>
+// #include <septentrio_gnss_driver/msg/pos_cov_cartesian.hpp>
+// #include <septentrio_gnss_driver/msg/pos_cov_geodetic.hpp>
+// #include <septentrio_gnss_driver/msg/pvt_cartesian.hpp>
+// #include <septentrio_gnss_driver/msg/pvt_geodetic.hpp>
+// #include <septentrio_gnss_driver/msg/receiver_time.hpp>
+// #include <septentrio_gnss_driver/msg/rf_band.hpp>
+// #include <septentrio_gnss_driver/msg/rf_status.hpp>
+// #include <septentrio_gnss_driver/msg/vector_info_cart.hpp>
+// #include <septentrio_gnss_driver/msg/vector_info_geod.hpp>
+// #include <septentrio_gnss_driver/msg/vel_cov_cartesian.hpp>
+// #include <septentrio_gnss_driver/msg/vel_cov_geodetic.hpp>
+// #include <septentrio_gnss_driver/msg/ext_sensor_meas.hpp>
+// #include <septentrio_gnss_driver/msg/imu_setup.hpp>
+// #include <septentrio_gnss_driver/msg/ins_nav_cart.hpp>
+// #include <septentrio_gnss_driver/msg/ins_nav_geod.hpp>
+// #include <septentrio_gnss_driver/msg/vel_sensor_setup.hpp>
+// // Rosaic includes
+// #include <septentrio_gnss_driver/communication/settings.hpp>
+// #include <septentrio_gnss_driver/parsers/sbf_utilities.hpp>
+// #include <septentrio_gnss_driver/parsers/string_utilities.
+
 
 class FusionEngineNode : public rclcpp::Node
 {
