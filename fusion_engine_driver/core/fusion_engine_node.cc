@@ -432,13 +432,9 @@ void FusionEngineNode::handleFusionMessage(
     reinterpret_cast<const uint8_t*>(&contents) + sizeof(InputDataWrapperMessage);
     size_t inner_size = header.payload_size_bytes - sizeof(InputDataWrapperMessage);
 
-    if (inner_payload[0] == 0x24 && inner_payload[1] == 0x40) {
-      uint16_t crc      = inner_payload[2] | (inner_payload[3] << 8);
+    if (isSBF(inner_payload, inner_size)) {
       uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
-      uint16_t length   = inner_payload[6] | (inner_payload[7] << 8);
-
-      uint16_t block_num = block_id & 0x1FFF;     // bits 0–12
-      uint8_t  revision  = (block_id >> 13) & 0x7;// bits 13–15
+      uint16_t block_num = block_id & 0x1FFF;
 
       if (block_num == static_cast<uint16_t>(SBFBlockID::PVTGeodetic)) {
         const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
@@ -458,8 +454,8 @@ void FusionEngineNode::handleFusionMessage(
 
       if(Helper::to_string(block_num) == "UnknownSBFBlock"){
         RCLCPP_WARN(this->get_logger(),
-          "Unknown SBF block detected: ID=0x%04X, length=%u, CRC=0x%04X",
-          block_id, length, crc);
+          "Unknown SBF block detected: ID=0x%04X",
+          block_id);
       }
     //    RCLCPP_INFO(this->get_logger(),
     //  "SBF block detected: ID=0x%04X (%s, rev=%u), length=%u, CRC=0x%04X",
