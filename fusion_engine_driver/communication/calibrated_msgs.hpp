@@ -22,11 +22,6 @@
 #include "fusion_engine_msgs/msg/vehicle_speed_output.hpp"
 #include "fusion_engine_msgs/msg/rpy.hpp"
 
-/* ========================================================================== */
-/*  CALIBRATED MESSAGE STRUCTS                                                */
-/*  Inline structs for zero-cost conversion from PointOne → ROS 2             */
-/* ========================================================================== */
-
 namespace calibrated_msgs {
 struct Imu : public sensor_msgs::msg::Imu {
   inline explicit Imu(const point_one::fusion_engine::messages::IMUOutput& p) {

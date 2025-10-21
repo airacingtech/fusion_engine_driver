@@ -23,12 +23,6 @@
 #include "fusion_engine_msgs/msg/gnss_satellite.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
 
-/* ========================================================================== */
-/*  FILTERED / NAVIGATION CONVERTERS                                          */
-/*  Inline header-only structs for zero-cost conversion from PointOne        */
-/*  FusionEngine messages → ROS 2 messages.                                  */
-/* ========================================================================== */
-
 namespace navigation_msgs {
 struct Pose : public fusion_engine_msgs::msg::Pose {
   inline explicit Pose(const point_one::fusion_engine::messages::PoseMessage& p) {

@@ -14,41 +14,6 @@
 
 #include "fusion_engine_node.hpp"
 
-#pragma pack(push, 1)
-struct PVTGeodetic {
-  uint32_t TOW;        // GPS Time of Week [ms]
-  uint16_t WNc;        // Week number
-  uint8_t  Mode;       // PVT mode bits (0–3 solution type, 6=static flag, 7=2D/3D flag)
-  uint8_t  Error;      // Error code
-  double   latitude;   // degrees
-  double   longitude;  // degrees
-  double   height;     // m (ellipsoidal)
-  float    undulation; // m (geoid height)
-  float    vn;         // north velocity (m/s)
-  float    ve;         // east velocity (m/s)
-  float    vu;         // up velocity (m/s)
-  float    cog;        // course over ground (degrees)
-  float    RxClkBias;  // receiver clock bias (m)
-  float    RxClkDrift; // receiver clock drift (m/s)
-  uint8_t  timeSystem; // 0: GPS, 1: GLONASS, 2: Galileo, etc.
-  uint8_t  datum;      // datum ID
-  uint8_t  nrSV;       // number of satellites used
-  uint8_t  WACorrInfo; // differential/RTK correction flags
-  uint16_t referenceID;// base station ID
-  uint16_t meanCorrAge;// correction age [0.01s]
-  uint16_t signalInfo; // bitmask of used signals
-  uint8_t  alertFlag;  // RAIM/integrity bits
-  uint8_t  NrBases;    // number of base stations used
-  uint16_t PPPInfo;    // PPP seed age/type bits
-  uint16_t latency;    // 0.0001s units
-  uint16_t HAccuracy;  // 0.01 m units (2DRMS horizontal)
-  uint16_t VAccuracy;  // 0.01 m units (2σ vertical)
-  uint8_t  misc;       // flags: baseline ref, ARP compensation, etc.
-  uint8_t  padding[3]; // to make total length = 96 bytes
-};
-#pragma pack(pop)
-
-
 /******************************************************************************/
 FusionEngineNode::FusionEngineNode()
 : Node("fusion_engine_node"),
@@ -461,11 +426,8 @@ void FusionEngineNode::handleFusionMessage(
     case MessageType::INPUT_DATA_WRAPPER: {
         auto & contents = *reinterpret_cast <
           const point_one::fusion_engine::messages::InputDataWrapperMessage * > (payload);
-          // RCLCPP_INFO(this->get_logger(),
-          //     "InputDataWrapper: data_type=0x%04X (%u)",
-          //     contents.data_type, contents.data_type);
 
-  if (contents.data_type == 0x00A1) {
+  if (contents.data_type == static_cast<uint16_t>(InputDataType::SBF_DATA)) {
     const uint8_t* inner_payload =
     reinterpret_cast<const uint8_t*>(&contents) + sizeof(InputDataWrapperMessage);
     size_t inner_size = header.payload_size_bytes - sizeof(InputDataWrapperMessage);
@@ -477,16 +439,23 @@ void FusionEngineNode::handleFusionMessage(
 
       uint16_t block_num = block_id & 0x1FFF;     // bits 0–12
       uint8_t  revision  = (block_id >> 13) & 0x7;// bits 13–15
-      if(block_num == 4007){
-        const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
-        septentrio_gnss_driver::msg::PVTGeodetic ros_pvt = PVTGeodetic(*pvt);
-         static auto pub = this->create_publisher<septentrio_gnss_driver::msg::PVTGeodetic>(
-          "septentrio/pvt_geodetic", rclcpp::SensorDataQoS());
 
-      pub->publish(ros_pvt);
-        // RCLCPP_INFO(get_logger(), "Lat: %.8f, Lon: %.8f, Height: %.3f, Vn: %.3f, Ve: %.3f",
-        //     ros_pvt.latitude, ros_pvt.longitude, ros_pvt.height, ros_pvt.vn, ros_pvt.ve);
+      if (block_num == static_cast<uint16_t>(SBFBlockID::PVTGeodetic)) {
+        const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
+        static auto pub = this->create_publisher<fusion_engine_msgs::msg::PVTGeodetic>(
+          "pvt_geodetic", rclcpp::SensorDataQoS());
+        sbf_msgs::PVTGeodetic msg{*pvt};
+        msg.header.frame_id = frame_id_;
+        msg.header.stamp = time;
+        pub->publish(reinterpret_cast<const fusion_engine_msgs::msg::PVTGeodetic&>(msg));
       }
+      // if(block_num == static_cast<uint16_t>(SBFBlockID::PVTCartesian) || 
+      //    block_num == static_cast<uint16_t>(SBFBlockID::PVTCartesian_v2)) {
+      //   const auto* pvt = reinterpret_cast<const PVTCartesian*>(inner_payload + 8); // skip 8-byte SBF header
+      //    RCLCPP_INFO(get_logger(), "X: %.8f, Y: %.8f, Z: %.3f, Vx: %.3f, Vy: %.3f",
+      //        pvt->x, pvt->y, pvt->z, pvt->vx, pvt->vy);
+      // }
+
       if(Helper::to_string(block_num) == "UnknownSBFBlock"){
         RCLCPP_WARN(this->get_logger(),
           "Unknown SBF block detected: ID=0x%04X, length=%u, CRC=0x%04X",

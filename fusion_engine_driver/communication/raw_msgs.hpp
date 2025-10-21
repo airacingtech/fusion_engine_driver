@@ -26,13 +26,7 @@
 #include "fusion_engine_msgs/msg/raw_wheel_tick_output.hpp"
 #include "fusion_engine_msgs/msg/raw_vehicle_tick_output.hpp"
 
-/* ========================================================================== */
-/*  RAW MESSAGE STRUCTS                                                      */
-/*  Inline zero-cost wrappers converting PointOne → ROS 2                    */
-/* ========================================================================== */
-
 namespace raw_msgs {
-
 struct RawImu : public sensor_msgs::msg::Imu {
   inline explicit RawImu(const point_one::fusion_engine::messages::RawIMUOutput& p) {
     linear_acceleration.x = (p.accel[0] == INT32_MAX) ? NAN :

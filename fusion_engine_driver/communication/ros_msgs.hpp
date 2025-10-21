@@ -19,12 +19,6 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "gps_msgs/msg/gps_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
-
-/* ========================================================================== */
-/*  ROS MESSAGE STRUCTS                                                       */
-/*  Inline zero-cost conversion from PointOne ROS messages → ROS 2 types      */
-/* ========================================================================== */
-
 namespace ros_msgs {
 struct Pose : public geometry_msgs::msg::PoseStamped {
   inline explicit Pose(const point_one::fusion_engine::messages::ros::PoseMessage& p) {
