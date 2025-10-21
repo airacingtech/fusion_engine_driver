@@ -22,14 +22,13 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-  septentrio_gnss_driver
+  septentrio_gnss_msgs
   GIT_REPOSITORY https://github.com/septentrio-gnss/septentrio_gnss_driver.git
-  GIT_TAG master           # or a specific release/tag (e.g. ros2 or iron branch)
-  GIT_SHALLOW TRUE       # optional but speeds up fetch
+  GIT_TAG master
 )
 
 FetchContent_Populate(fusion_engine_client)
-FetchContent_Populate(septentrio_gnss_driver)
+FetchContent_Populate(septentrio_gnss_msgs)
 add_subdirectory(${fusion_engine_client_SOURCE_DIR} ${fusion_engine_client_BINARY_DIR})
 
 # find dependencies
@@ -44,13 +43,26 @@ find_package(visualization_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(nmea_msgs REQUIRED)
 find_package(fusion_engine_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(rosidl_default_runtime REQUIRED)
 
+file(GLOB SEPTENTRIO_MSG_FILES
+  "${septentrio_gnss_msgs_SOURCE_DIR}/msg/*.msg"
+)
+
+if(SEPTENTRIO_MSG_FILES)
+  rosidl_generate_interfaces(${PROJECT_NAME}
+    ${SEPTENTRIO_MSG_FILES}
+    DEPENDENCIES std_msgs sensor_msgs geometry_msgs
+  )
+else()
+  message(FATAL_ERROR "No Septentrio .msg files found in ${septentrio_gnss_msgs_SOURCE_DIR}/msg")
+endif()
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
-
+include_directories(${septentrio_gnss_msgs_SOURCE_DIR}/msg)
 include_directories(./core ./utils ./transport ./communication)
-
 set(SRC
     ${SOURCE}
     ${CMAKE_CURRENT_SOURCE_DIR}/core/main.cc

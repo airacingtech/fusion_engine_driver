@@ -479,8 +479,13 @@ void FusionEngineNode::handleFusionMessage(
       uint8_t  revision  = (block_id >> 13) & 0x7;// bits 13–15
       if(block_num == 4007){
         const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
-RCLCPP_INFO(get_logger(), "Lat: %.8f, Lon: %.8f, Height: %.3f, Vn: %.3f, Ve: %.3f",
-            pvt->latitude, pvt->longitude, pvt->height, pvt->vn, pvt->ve);
+        septentrio_gnss_driver::msg::PVTGeodetic ros_pvt = PVTGeodetic(*pvt);
+         static auto pub = this->create_publisher<septentrio_gnss_driver::msg::PVTGeodetic>(
+          "septentrio/pvt_geodetic", rclcpp::SensorDataQoS());
+
+      pub->publish(ros_pvt);
+        // RCLCPP_INFO(get_logger(), "Lat: %.8f, Lon: %.8f, Height: %.3f, Vn: %.3f, Ve: %.3f",
+        //     ros_pvt.latitude, ros_pvt.longitude, ros_pvt.height, ros_pvt.vn, ros_pvt.ve);
       }
       if(Helper::to_string(block_num) == "UnknownSBFBlock"){
         RCLCPP_WARN(this->get_logger(),

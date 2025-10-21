@@ -38,6 +38,7 @@
 #include "calibrated_msgs.hpp"
 #include "raw_msgs.hpp"
 #include "ros_msgs.hpp"
+#include "sepentrio_msgs.hpp"
 
 #include "helper.hpp"
 #include "gps_msgs/msg/gps_fix.hpp"
