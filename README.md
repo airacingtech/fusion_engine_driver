@@ -1,21 +1,38 @@
-# Deprecated
-
-We are working on a new version of the ROS2 driver to better adhere to the design patterns commonly found in newer ROS packages. 
-
 # Point One FusionEngine ROS 2 Driver
 
 This project contains support for interacting with the Point One navigation engine in ROS 2 using the FusionEngine
 protocol. The driver can be configured to talk to a FusionEngine device over TCP, UDP, or serial connection. The ROS
-driver will receive data from the FusionEngine device, and will publish the following ROS topics:
+driver will receive data from the FusionEngine device, and will publish navigation, calibrated, and raw data.
 
-* [pose](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)
-* [gps_fix](http://docs.ros.org/en/hydro/api/gps_common/html/msg/GPSFix.html)
-* [fix](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/NavSatFix.html)
-* [imu](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Imu.html)
-* [visualization_marker](http://wiki.ros.org/rviz/DisplayTypes/Marker)
+The Fusion Message Specification outlines the structure of all three groups and can be found [here](https://pointonenav.com/wp-content/uploads/2025/08/FusionEngine-Message-Specification-0.23.pdf).
 
-See https://github.com/PointOneNav/fusion-engine-client for the latest details and support code for the Point One
-FusionEngine protocol.
+The driver topics can all be found in **fusion_dispatch.hpp**.
+- **Navigation Topics**
+- - **Pose**: "pose_filtered"
+- - **Pose Aux**: "pose_aux"
+- - **Calibration Status**: "calibration_status"
+- - **GNSS Info**: "gnss_info"
+- - **GNSS Satellite**: "gnss_satellite"
+- - **Relative Position (ENU)**: "relative_enu_position"
+- **Calibrated Topics**
+- - **IMU**: "imu_calibrated"
+- - **GNSS Attitude**: "gnss_attitude"
+- - **Wheel Speed**: "wheel_speed"
+- - **Vehicle Speed**: "vehicle_speed"
+- **Raw Topics**
+- - **PVTGeodetic**: "pvt_geodetic"
+- - **IMU**: "imu_raw"
+- - **GNSS Attitude**: "gnss_attitude_raw"
+- - **Wheel Tick**: "wheel_tick_raw"
+- - **Vehicle Tick**: "vehicle_tick_raw"
+- - **Wheel Speed**: "wheel_speed_raw"
+- - **Vehicle Speed**: "vehicle_speed_raw"
+- **Standard ROS Topics**
+- - **Pose**: "pose_ros"
+- - **GPSFix**: "gpsfix_ros"
+- - **IMU**: "imu_ros"
+
+See [fusion-engine-client](https://github.com/PointOneNav/fusion-engine-client) for the latest details and support code for the Point One FusionEngine protocol.
 
 This library is released under the [MIT license agreement](LICENSE). We welcome code and documentation contributions
 from users. See [Contributing](CONTRIBUTING.md) for instructions on how to report issues and develop, test, and submit
