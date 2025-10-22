@@ -12,44 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+#ifndef FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_INTERFACE_HPP_
+#define FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_INTERFACE_HPP_
 
-#include <point_one/fusion_engine/messages/core.h>
-#include <point_one/fusion_engine/messages/ros.h>
 #include <point_one/fusion_engine/parsers/fusion_engine_framer.h>
+#include "fusion_dispatch.hpp"
 
 #include <string>
 #include <memory>
 #include <cstdio>
 #include <vector>
 
-#include "std_msgs/msg/string.hpp"
-
-#include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include "sensor_msgs/msg/nav_sat_status.hpp"
-
-#include "gps_msgs/msg/gps_status.hpp"
-
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "mavros_msgs/msg/rtcm.hpp"
-#include "nmea_msgs/msg/sentence.hpp"
-
-#include "navigation_msgs.hpp"
-#include "calibrated_msgs.hpp"
-#include "raw_msgs.hpp"
-#include "ros_msgs.hpp"
-#include "sbf_msgs.hpp"
-
-#include "helper.hpp"
-#include "gps_msgs/msg/gps_fix.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "sensor_msgs/msg/imu.hpp"
-#include "std_msgs/msg/string.hpp"
+
 #include "tcp_listener.hpp"
 #include "tty_listener.hpp"
 
-using namespace point_one::fusion_engine::messages;
-using namespace point_one::fusion_engine::messages::ros;
 /**
  * For payload information and byte ordering, please reference:
  * https://pointonenav.com/wp-content/uploads/2025/08/FusionEngine-Message-Specification-0.23.pdf
@@ -180,3 +158,5 @@ private:
    */
   std::shared_ptr<DataListener> data_listener_;
 };
+
+#endif  // FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_INTERFACE_HPP_
