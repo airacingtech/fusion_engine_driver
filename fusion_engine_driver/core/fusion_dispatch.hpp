@@ -108,7 +108,7 @@ inline const Handler& findHandler(const MessageHeader& header)
   if (it != table.end())
     return it->second;
   if (header.message_type == MessageType::INPUT_DATA_WRAPPER)
-    return kSBFOp;
+    return kNoOp;
 
   return kNoOp;
 }
