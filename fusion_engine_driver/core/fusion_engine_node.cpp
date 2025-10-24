@@ -72,8 +72,7 @@ void FusionEngineNode::handleFusionMessage(
   const void * payload)
 {
   StatusResult status{Errors::noError};
-  findHandler(header.message_type)(this, payload, frame_id_, this->now());
-  
+  findHandler(header)(this, payload, frame_id_, this->now());
   // switch (type) {
   //   // Navigation Solutions
   //   case MessageType::POSE:
