@@ -102,9 +102,10 @@ inline const Handler& findHandler(const MessageHeader& header)
         uint16_t block_num = block_id & 0x1FFF;
         auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
         if (it != kSBF().end()) {
+	  RCLCPP_INFO(n->get_logger(), "Got block!");
           it->second(n, inner_payload + 8, f, t);
         } else {
-          RCLCPP_DEBUG(n->get_logger(),
+          RCLCPP_INFO(n->get_logger(),
             "No registered SBF handler for block 0x%04X (%s)",
             block_num, to_string(block_num).c_str());
         }

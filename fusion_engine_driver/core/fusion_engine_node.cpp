@@ -73,7 +73,8 @@ void FusionEngineNode::handleFusionMessage(
 {
   StatusResult status{Errors::noError};
   findHandler(header)(this, payload, frame_id_, this->now());
-  // switch (type) {
+// auto time = this->now();
+//  switch (header.message_type) {
   //   // Navigation Solutions
   //   case MessageType::POSE:
   //     {
@@ -285,24 +286,24 @@ void FusionEngineNode::handleFusionMessage(
   //   case MessageType::INPUT_DATA_WRAPPER: {
   //       auto & contents = *reinterpret_cast <
   //         const point_one::fusion_engine::messages::InputDataWrapperMessage * > (payload);
-
+  //
   // if (contents.data_type == static_cast<uint16_t>(InputDataType::SBF_DATA)) {
   //   const uint8_t* inner_payload =
   //   reinterpret_cast<const uint8_t*>(&contents) + sizeof(InputDataWrapperMessage);
   //   size_t inner_size = header.payload_size_bytes - sizeof(InputDataWrapperMessage);
 
-  //   if (isSBF(inner_payload, inner_size)) {
-  //     uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
+//     if (isSBF(inner_payload, inner_size)) {
+ //      uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
   //     uint16_t block_num = block_id & 0x1FFF;
 
   //     if (block_num == static_cast<uint16_t>(SBFBlockID::PVTGeodetic)) {
   //       const auto* pvt = reinterpret_cast<const PVTGeodetic*>(inner_payload + 8); // skip 8-byte SBF header
   //       static auto pub = this->create_publisher<fusion_engine_msgs::msg::PVTGeodetic>(
-  //         "pvt_geodetic", rclcpp::SensorDataQoS());
-  //       sbf_msgs::PVTGeodetic msg{*pvt};
+ //          "pvt_geodetic", rclcpp::SensorDataQoS());
+ //        sbf_msgs::PVTGeodetic msg{*pvt};
   //       msg.header.frame_id = frame_id_;
   //       msg.header.stamp = time;
-  //       pub->publish(reinterpret_cast<const fusion_engine_msgs::msg::PVTGeodetic&>(msg));
+ //        pub->publish(reinterpret_cast<const fusion_engine_msgs::msg::PVTGeodetic&>(msg));
   //     }
   //     // if(block_num == static_cast<uint16_t>(SBFBlockID::PVTCartesian) || 
   //     //    block_num == static_cast<uint16_t>(SBFBlockID::PVTCartesian_v2)) {
@@ -313,20 +314,19 @@ void FusionEngineNode::handleFusionMessage(
 
   //     if(Helper::to_string(block_num) == "UnknownSBFBlock"){
   //       RCLCPP_WARN(this->get_logger(),
-  //         "Unknown SBF block detected: ID=0x%04X, length=%u, CRC=0x%04X",
+//  }
+//         "Unknown SBF block detected: ID=0x%04X, length=%u, CRC=0x%04X",
   //         block_id);
   //     }
   //   //    RCLCPP_INFO(this->get_logger(),
   //   //  "SBF block detected: ID=0x%04X (%s, rev=%u), length=%u, CRC=0x%04X",
   //   //  block_id, Helper::to_string(block_num).c_str(), revision, length, crc);
-  //   }
   //   //Helper::dumpHex(this->get_logger(), header, inner_size, "SBF Payload");
-  // }
-  // break;
+ //  }
+ //  break;
   //     }
   //   default:
   //     break;
-  // }
 }
 
 /******************************************************************************/
