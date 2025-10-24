@@ -79,7 +79,7 @@ using SBFHandler = std::function<void(rclcpp::Node*, const uint8_t*, const std::
 inline const auto& kSBF()
 {
   static const std::unordered_map<SBFBlockID, SBFHandler> kSBFHandles = {
-    {SBFBlockID::PVTGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<PVTGeodetic, sbf_msgs::PVTGeodetic, fusion_engine_msgs::msg::PVTGeodetic>(n, "pvt_geodetic", reinterpret_cast<const PVTGeodetic*>(p), id, t); }},
+    {SBFBlockID::PVTGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<::PVTGeodetic, sbf_msgs::PVTGeodetic, fusion_engine_msgs::msg::PVTGeodetic>(n, "pvt_geodetic", reinterpret_cast<const ::PVTGeodetic*>(p), id, t); }},
   };
   return kSBFHandles;
 }
@@ -100,7 +100,6 @@ inline const Handler& findHandler(const MessageHeader& header)
       if (isSBF(inner_payload, inner_size)) {
         uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
         uint16_t block_num = block_id & 0x1FFF;
-        RCLCPP_INFO(n->get_logger(), "Detected SBF block 0x%04X (%u)", block_num, block_num);
         auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
         if (it != kSBF().end()) {
           it->second(n, inner_payload + sizeof(::Header), f, t);
