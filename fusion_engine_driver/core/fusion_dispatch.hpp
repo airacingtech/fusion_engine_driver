@@ -100,7 +100,7 @@ inline const Handler& findHandler(const MessageHeader& header)
       if (isSBF(inner_payload, inner_size)) {
         uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
         uint16_t block_num = block_id & 0x1FFF;
-        kSBF().find(static_cast<SBFBlockID>(block_num))->second(n, inner_payload, f, t);
+        // kSBF().find(static_cast<SBFBlockID>(block_num))->second(n, inner_payload, f, t);
       }
     }
   };
@@ -108,7 +108,7 @@ inline const Handler& findHandler(const MessageHeader& header)
   if (it != table.end())
     return it->second;
   if (header.message_type == MessageType::INPUT_DATA_WRAPPER)
-    return kNoOp;
+    return kSBFOp;
 
   return kNoOp;
 }
