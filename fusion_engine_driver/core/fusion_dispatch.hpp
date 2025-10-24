@@ -79,7 +79,7 @@ using SBFHandler = std::function<void(rclcpp::Node*, const uint8_t*, const std::
 inline const auto& kSBF()
 {
   static const std::unordered_map<SBFBlockID, SBFHandler> kSBFHandles = {
-    {SBFBlockID::PVTGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<::PVTGeodetic, sbf_msgs::PVTGeodetic, fusion_engine_msgs::msg::PVTGeodetic>(n, "pvt_geodetic", reinterpret_cast<const ::PVTGeodetic*>(p), id, t); }},
+    {SBFBlockID::PVTGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<::PVTGeodetic, sbf_msgs::PVTGeodetic, fusion_engine_msgs::msg::PVTGeodetic>(n, "pvt_geodetic", reinterpret_cast<const ::PVTGeodetic*>(p + 8), id, t); }},
   };
   return kSBFHandles;
 }
@@ -102,7 +102,7 @@ inline const Handler& findHandler(const MessageHeader& header)
         uint16_t block_num = block_id & 0x1FFF;
         auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
         if (it != kSBF().end()) {
-          it->second(n, inner_payload + sizeof(::Header), f, t);
+          it->second(n, inner_payload + 8, f, t);
         } else {
           RCLCPP_DEBUG(n->get_logger(),
             "No registered SBF handler for block 0x%04X (%s)",
