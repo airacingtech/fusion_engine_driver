@@ -101,7 +101,14 @@ inline const Handler& findHandler(const MessageHeader& header)
         uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
         uint16_t block_num = block_id & 0x1FFF;
         RCLCPP_INFO(n->get_logger(), "Detected SBF block 0x%04X (%u)", block_num, block_num);
-        kSBF().find(static_cast<SBFBlockID>(block_num))->second(n, inner_payload, f, t);
+        auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
+        if (it != kSBF().end()) {
+          it->second(n, inner_payload + sizeof(::Header), f, t);
+        } else {
+          RCLCPP_DEBUG(n->get_logger(),
+            "No registered SBF handler for block 0x%04X (%s)",
+            block_num, to_string(block_num).c_str());
+        }
       }
     }
   };
@@ -110,7 +117,6 @@ inline const Handler& findHandler(const MessageHeader& header)
     return it->second;
   if (header.message_type == MessageType::INPUT_DATA_WRAPPER)
     return kSBFOp;
-
   return kNoOp;
 }
 
