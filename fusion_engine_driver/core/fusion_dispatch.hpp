@@ -133,7 +133,9 @@ inline const Handler& findHandler(MessageType type)
   std::cout << "Inside" << "\n";
   auto it = table.find(type);
   if (it == table.end())
-    RCLCPP_WARN(rclcpp::get_logger("FusionEngineNode"), "No handler for message type ", to_string(type));
+    RCLCPP_WARN(rclcpp::get_logger("FusionEngineNode"),
+            "No handler for message type %s", to_string(type));
+
   return it->second;
 }
 
