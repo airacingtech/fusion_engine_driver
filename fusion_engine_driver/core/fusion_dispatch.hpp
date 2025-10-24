@@ -50,77 +50,27 @@ inline const auto& kHandlers()
 {
   static const std::unordered_map<MessageType, Handler> kHandles = {
     // Navigation
-    {MessageType::POSE, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::PoseMessage, navigation_msgs::Pose, fusion_engine_msgs::msg::Pose >(n, "pose_filtered", reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage*>(p), id, t);
-    }},
-    // {MessageType::POSE_AUX, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<navigation_msgs::PoseAux, PoseAuxMessage>(n, "pose_aux",
-    //                                                      reinterpret_cast<const PoseAuxMessage*>(p), id, t);
-    // }},
-    // {MessageType::CALIBRATION_STATUS, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<navigation_msgs::CalibrationStatus, CalibrationStatusMessage>(
-    //       n, "calibration_status",
-    //       reinterpret_cast<const CalibrationStatusMessage*>(p), id, t);
-    // }},
-    // {MessageType::GNSS_INFO, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<navigation_msgs::GnssInfo, GNSSInfoMessage>(n, "gnss_info",
-    //                                                        reinterpret_cast<const GNSSInfoMessage*>(p), id, t);
-    // }},
-    // {MessageType::GNSS_SATELLITE, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<navigation_msgs::GnssSatellite, GNSSSatelliteMessage>(
-    //       n, "gnss_satellite",
-    //       reinterpret_cast<const GNSSSatelliteMessage*>(p), id, t);
-    // }},
-    // {MessageType::RELATIVE_ENU_POSITION, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<navigation_msgs::RelativeEnuPosition, RelativeENUPositionMessage>(
-    //       n, "relative_enu_position",
-    //       reinterpret_cast<const RelativeENUPositionMessage*>(p), id, t);
-    // }},
+    {MessageType::POSE, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::PoseMessage, navigation_msgs::Pose, fusion_engine_msgs::msg::Pose>(n, "pose_filtered", reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage*>(p), id, t); }},
+    {MessageType::POSE_AUX, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::PoseAuxMessage, navigation_msgs::PoseAux, fusion_engine_msgs::msg::PoseAux>(n, "pose_aux", reinterpret_cast<const point_one::fusion_engine::messages::PoseAuxMessage*>(p), id, t); }},
+    {MessageType::CALIBRATION_STATUS, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::CalibrationStatusMessage, navigation_msgs::CalibrationStatus, fusion_engine_msgs::msg::CalibrationStatus>(n, "calibration_status", reinterpret_cast<const point_one::fusion_engine::messages::CalibrationStatusMessage*>(p), id, t); }},
+    {MessageType::GNSS_INFO, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::GNSSInfoMessage, navigation_msgs::GnssInfo, fusion_engine_msgs::msg::GnssInfo>(n, "gnss_info", reinterpret_cast<const point_one::fusion_engine::messages::GNSSInfoMessage*>(p), id, t); }},
+    {MessageType::GNSS_SATELLITE, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::GNSSSatelliteMessage, navigation_msgs::GnssSatellite, fusion_engine_msgs::msg::GnssSatellite>(n, "gnss_satellite", reinterpret_cast<const point_one::fusion_engine::messages::GNSSSatelliteMessage*>(p), id, t); }},
+    {MessageType::RELATIVE_ENU_POSITION, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::RelativeENUPositionMessage, navigation_msgs::RelativeEnuPosition, fusion_engine_msgs::msg::RelativeEnuPosition>(n, "relative_enu_position", reinterpret_cast<const point_one::fusion_engine::messages::RelativeENUPositionMessage*>(p), id, t); }},
 
-    // // Calibrated
-    // {MessageType::IMU_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<calibrated_msgs::Imu, IMUOutput>(n, "imu_calibrated",
-    //                                             reinterpret_cast<const IMUOutput*>(p), id, t);
-    // }},
-    // {MessageType::GNSS_ATTITUDE_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<calibrated_msgs::GnssAttitudeOutput, GNSSAttitudeOutput>(
-    //       n, "gnss_attitude",
-    //       reinterpret_cast<const GNSSAttitudeOutput*>(p), id, t);
-    // }},
-    // {MessageType::WHEEL_SPEED_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<calibrated_msgs::WheelSpeedOutput, WheelSpeedOutput>(
-    //       n, "wheel_speed",
-    //       reinterpret_cast<const WheelSpeedOutput*>(p), id, t);
-    // }},
-    // {MessageType::VEHICLE_SPEED_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<calibrated_msgs::VehicleSpeedOutput, VehicleSpeedOutput>(
-    //       n, "vehicle_speed",
-    //       reinterpret_cast<const VehicleSpeedOutput*>(p), id, t);
-    // }},
+    // Calibrated
+    {MessageType::IMU_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::IMUOutput, calibrated_msgs::Imu, sensor_msgs::msg::Imu>(n, "imu_calibrated", reinterpret_cast<const point_one::fusion_engine::messages::IMUOutput*>(p), id, t); }},
+    {MessageType::GNSS_ATTITUDE_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::GNSSAttitudeOutput, calibrated_msgs::GnssAttitudeOutput, fusion_engine_msgs::msg::GnssAttitudeOutput>(n, "gnss_attitude", reinterpret_cast<const point_one::fusion_engine::messages::GNSSAttitudeOutput*>(p), id, t); }},
+    {MessageType::WHEEL_SPEED_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::WheelSpeedOutput, calibrated_msgs::WheelSpeedOutput, fusion_engine_msgs::msg::WheelSpeedOutput>(n, "wheel_speed", reinterpret_cast<const point_one::fusion_engine::messages::WheelSpeedOutput*>(p), id, t); }},
+    {MessageType::VEHICLE_SPEED_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::VehicleSpeedOutput, calibrated_msgs::VehicleSpeedOutput, fusion_engine_msgs::msg::VehicleSpeedOutput>(n, "vehicle_speed", reinterpret_cast<const point_one::fusion_engine::messages::VehicleSpeedOutput*>(p), id, t); }},
 
-    // // Raw
-    // {MessageType::RAW_IMU_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<raw_msgs::RawImu, RawIMUOutput>(n, "imu_raw",
-    //                                            reinterpret_cast<const RawIMUOutput*>(p), id, t);
-    // }},
-    // {MessageType::RAW_WHEEL_TICK_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<raw_msgs::RawWheelTickOutput, RawWheelTickOutput>(
-    //       n, "wheel_tick_raw",
-    //       reinterpret_cast<const RawWheelTickOutput*>(p), id, t);
-    // }},
+    // Raw
+    {MessageType::RAW_IMU_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::RawIMUOutput, raw_msgs::RawImu, sensor_msgs::msg::Imu>(n, "imu_raw", reinterpret_cast<const point_one::fusion_engine::messages::RawIMUOutput*>(p), id, t); }},
+    {MessageType::RAW_WHEEL_TICK_OUTPUT, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::RawWheelTickOutput, raw_msgs::RawWheelTickOutput, fusion_engine_msgs::msg::RawWheelTickOutput>(n, "wheel_tick_raw", reinterpret_cast<const point_one::fusion_engine::messages::RawWheelTickOutput*>(p), id, t); }},
 
-    // // ROS-standard outputs
-    // {MessageType::ROS_POSE, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<ros_msgs::Pose, PoseMessage>(n, "pose_ros",
-    //                                         reinterpret_cast<const PoseMessage*>(p), id, t);
-    // }},
-    // {MessageType::ROS_GPS_FIX, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<ros_msgs::GPSFix, GPSFixMessage>(n, "gpsfix_ros",
-    //                                             reinterpret_cast<const GPSFixMessage*>(p), id, t);
-    // }},
-    // {MessageType::ROS_IMU, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-    //     handle<ros_msgs::Imu, IMUMessage>(n, "imu_ros",
-    //                                       reinterpret_cast<const IMUMessage*>(p), id, t);
-    // }},
+    // ROS-standard
+    {MessageType::ROS_POSE, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::ros::PoseMessage, ros_msgs::Pose, geometry_msgs::msg::PoseStamped>(n, "pose_ros", reinterpret_cast<const point_one::fusion_engine::messages::ros::PoseMessage*>(p), id, t); }},
+    {MessageType::ROS_GPS_FIX, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::ros::GPSFixMessage, ros_msgs::GPSFix, gps_msgs::msg::GPSFix>(n, "gpsfix_ros", reinterpret_cast<const point_one::fusion_engine::messages::ros::GPSFixMessage*>(p), id, t); }},
+    {MessageType::ROS_IMU, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){ handle<point_one::fusion_engine::messages::ros::IMUMessage, ros_msgs::Imu, sensor_msgs::msg::Imu>(n, "imu_ros", reinterpret_cast<const point_one::fusion_engine::messages::ros::IMUMessage*>(p), id, t); }},
   };
   return kHandles;
 }
@@ -130,11 +80,15 @@ inline const auto& kHandlers()
 inline const Handler& findHandler(MessageType type)
 {
   const auto& table = kHandlers();
-  std::cout << "Inside" << "\n";
+
+  static const Handler kNoOp = [](auto*, auto*, const std::string&, const rclcpp::Time&) {
+  };
+
   auto it = table.find(type);
-  if (it == table.end())
-    throw std::out_of_range(std::string("No handler for ") + to_string(type));
-  return it->second;
+  if (it != table.end())
+    return it->second;
+
+  return kNoOp;
 }
 
 #endif  // FUSION_ENGINE_DRIVER__CORE__FUSION_DISPATCH_HPP_
