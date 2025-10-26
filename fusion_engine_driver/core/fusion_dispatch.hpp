@@ -207,7 +207,8 @@ inline const Handler& findHandler(const MessageHeader& header)
     if (it != kSBF().end()) {
       it->second(n, inner_payload + 8, f, t);
     } else {
-      RCLCPP_INFO(n->get_logger(),
+
+      RCLCPP_DEBUG(n->get_logger(),
                    "No registered SBF handler for block 0x%04X (%s)",
                    block_num, to_string(block_num).c_str());
     }
