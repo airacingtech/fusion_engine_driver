@@ -10,7 +10,8 @@
 
 namespace calibrated_msgs {
 struct Imu : public sensor_msgs::msg::Imu {
-  inline explicit Imu(const point_one::fusion_engine::messages::IMUOutput& p) {
+  ~Imu() noexcept = default;
+  inline explicit Imu(const point_one::fusion_engine::messages::IMUOutput& p) noexcept {
     linear_acceleration.x = p.accel_mps2[0];
     linear_acceleration.y = p.accel_mps2[1];
     linear_acceleration.z = p.accel_mps2[2];
@@ -30,7 +31,8 @@ struct Imu : public sensor_msgs::msg::Imu {
 };
 
 struct GnssAttitudeOutput : public fusion_engine_msgs::msg::GnssAttitudeOutput {
-  inline explicit GnssAttitudeOutput(const point_one::fusion_engine::messages::GNSSAttitudeOutput& p) {
+  ~GnssAttitudeOutput() noexcept = default;
+  inline explicit GnssAttitudeOutput(const point_one::fusion_engine::messages::GNSSAttitudeOutput& p) noexcept {
     solution_type = static_cast<int>(p.solution_type);
 
     rpy.roll  = p.ypr_deg[2];
@@ -47,7 +49,8 @@ struct GnssAttitudeOutput : public fusion_engine_msgs::msg::GnssAttitudeOutput {
 };
 
 struct WheelSpeedOutput : public fusion_engine_msgs::msg::WheelSpeedOutput {
-  inline explicit WheelSpeedOutput(const point_one::fusion_engine::messages::WheelSpeedOutput& p) {
+  ~WheelSpeedOutput() noexcept = default;
+  inline explicit WheelSpeedOutput(const point_one::fusion_engine::messages::WheelSpeedOutput& p) noexcept {
     gear = static_cast<int>(p.gear);
     fl = p.front_left_speed_mps;
     fr = p.front_right_speed_mps;
@@ -57,7 +60,8 @@ struct WheelSpeedOutput : public fusion_engine_msgs::msg::WheelSpeedOutput {
 };
 
 struct VehicleSpeedOutput : public fusion_engine_msgs::msg::VehicleSpeedOutput {
-  inline explicit VehicleSpeedOutput(const point_one::fusion_engine::messages::VehicleSpeedOutput& p) {
+  ~VehicleSpeedOutput() noexcept = default;
+  inline explicit VehicleSpeedOutput(const point_one::fusion_engine::messages::VehicleSpeedOutput& p) noexcept {
     gear = static_cast<int>(p.gear);
     speed = p.vehicle_speed_mps;
   }

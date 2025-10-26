@@ -11,7 +11,8 @@
 
 namespace navigation_msgs {
 struct Pose : public fusion_engine_msgs::msg::Pose {
-  inline explicit Pose(const point_one::fusion_engine::messages::PoseMessage& p) {
+  ~Pose() noexcept = default;
+  inline explicit Pose(const point_one::fusion_engine::messages::PoseMessage& p) noexcept {
     p1_time.seconds = p.p1_time.seconds;
     p1_time.fraction_ns = p.p1_time.fraction_ns;
     gps_time.seconds = p.gps_time.seconds;
@@ -49,6 +50,7 @@ struct Pose : public fusion_engine_msgs::msg::Pose {
 };
 
 struct PoseAux : public fusion_engine_msgs::msg::PoseAux {
+  ~PoseAux() noexcept = default;
   inline explicit PoseAux(const point_one::fusion_engine::messages::PoseAuxMessage& p) {
     p1_time.seconds = p.p1_time.seconds;
     p1_time.fraction_ns = p.p1_time.fraction_ns;
@@ -77,6 +79,7 @@ struct PoseAux : public fusion_engine_msgs::msg::PoseAux {
 }; 
 
 struct GnssInfo : public fusion_engine_msgs::msg::GnssInfo {
+  ~GnssInfo() noexcept = default;
   inline explicit GnssInfo(const point_one::fusion_engine::messages::GNSSInfoMessage& p) {
     p1_time.seconds = p.p1_time.seconds;
     p1_time.fraction_ns = p.p1_time.fraction_ns;
@@ -99,7 +102,8 @@ struct GnssInfo : public fusion_engine_msgs::msg::GnssInfo {
 };
 
 struct GnssSatelliteInfo : public fusion_engine_msgs::msg::GnssSatelliteInfo {
-  inline explicit GnssSatelliteInfo(const point_one::fusion_engine::messages::SatelliteInfo& sat) {
+  ~GnssSatelliteInfo() noexcept = default;
+  inline explicit GnssSatelliteInfo(const point_one::fusion_engine::messages::SatelliteInfo& sat) noexcept {
     prn = sat.prn;
     constellation = static_cast<uint8_t>(sat.system);
     cn0 = sat.cn0;
@@ -110,7 +114,8 @@ struct GnssSatelliteInfo : public fusion_engine_msgs::msg::GnssSatelliteInfo {
 };
 
 struct GnssSatellite : public fusion_engine_msgs::msg::GnssSatellite {
-  inline explicit GnssSatellite(const point_one::fusion_engine::messages::GNSSSatelliteMessage& p) {
+  ~GnssSatellite() noexcept = default;
+  inline explicit GnssSatellite(const point_one::fusion_engine::messages::GNSSSatelliteMessage& p) noexcept {
     p1_time.seconds = p.p1_time.seconds;
     p1_time.fraction_ns = p.p1_time.fraction_ns;
     gps_time.seconds = p.gps_time.seconds;
@@ -121,7 +126,8 @@ struct GnssSatellite : public fusion_engine_msgs::msg::GnssSatellite {
 };
 
 struct CalibrationStatus : public fusion_engine_msgs::msg::CalibrationStatus {
-  inline explicit CalibrationStatus(const point_one::fusion_engine::messages::CalibrationStatusMessage& p) {
+  ~CalibrationStatus() noexcept = default;
+  inline explicit CalibrationStatus(const point_one::fusion_engine::messages::CalibrationStatusMessage& p) noexcept {
     p1_time.seconds = p.p1_time.seconds;
     p1_time.fraction_ns = p.p1_time.fraction_ns;
     calibration_stage = static_cast<uint8_t>(p.calibration_stage);
@@ -149,7 +155,8 @@ struct CalibrationStatus : public fusion_engine_msgs::msg::CalibrationStatus {
 };
 
 struct RelativeEnuPosition : public fusion_engine_msgs::msg::RelativeEnuPosition {
-  inline explicit RelativeEnuPosition(const point_one::fusion_engine::messages::RelativeENUPositionMessage& p) {
+  ~RelativeEnuPosition() noexcept = default;
+  inline explicit RelativeEnuPosition(const point_one::fusion_engine::messages::RelativeENUPositionMessage& p) noexcept {
     p1_time.seconds = p.p1_time.seconds;
     p1_time.fraction_ns = p.p1_time.fraction_ns;
     gps_time.seconds = p.gps_time.seconds;

@@ -7,7 +7,8 @@
 #include "sensor_msgs/msg/imu.hpp"
 namespace ros_msgs {
 struct Pose : public geometry_msgs::msg::PoseStamped {
-  inline explicit Pose(const point_one::fusion_engine::messages::ros::PoseMessage& p) {
+  ~Pose() noexcept = default;
+  inline explicit Pose(const point_one::fusion_engine::messages::ros::PoseMessage& p) noexcept {
     pose.position.x = p.position_rel_m[0];
     pose.position.y = p.position_rel_m[1];
     pose.position.z = p.position_rel_m[2];
@@ -20,7 +21,8 @@ struct Pose : public geometry_msgs::msg::PoseStamped {
 };
 
 struct GPSFix : public gps_msgs::msg::GPSFix {
-  inline explicit GPSFix(const point_one::fusion_engine::messages::ros::GPSFixMessage& p) {
+  ~GPSFix() noexcept = default;
+  inline explicit GPSFix(const point_one::fusion_engine::messages::ros::GPSFixMessage& p) noexcept {
     latitude  = p.latitude_deg;
     longitude = p.longitude_deg;
     altitude  = p.altitude_m;
@@ -60,7 +62,8 @@ struct GPSFix : public gps_msgs::msg::GPSFix {
 };
 
 struct Imu : public sensor_msgs::msg::Imu {
-  inline explicit Imu(const point_one::fusion_engine::messages::ros::IMUMessage& p) {
+  ~Imu() noexcept = default;
+  inline explicit Imu(const point_one::fusion_engine::messages::ros::IMUMessage& p) noexcept {
     orientation.x = p.orientation[0];
     orientation.y = p.orientation[1];
     orientation.z = p.orientation[2];

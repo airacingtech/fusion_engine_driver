@@ -14,7 +14,8 @@
 
 namespace raw_msgs {
 struct RawImu : public sensor_msgs::msg::Imu {
-  inline explicit RawImu(const point_one::fusion_engine::messages::RawIMUOutput& p) {
+  ~RawImu() noexcept = default;
+  inline explicit RawImu(const point_one::fusion_engine::messages::RawIMUOutput& p) noexcept {
     linear_acceleration.x = (p.accel[0] == INT32_MAX) ? NAN :
       static_cast<double>(p.accel[0]) / 65536.0;
     linear_acceleration.y = (p.accel[1] == INT32_MAX) ? NAN :
@@ -32,7 +33,8 @@ struct RawImu : public sensor_msgs::msg::Imu {
 };
 
 struct RawGnssAttitudeOutput : public fusion_engine_msgs::msg::RawGnssAttitudeOutput {
-  inline explicit RawGnssAttitudeOutput(const point_one::fusion_engine::messages::RawGNSSAttitudeOutput& p) {
+  ~RawGnssAttitudeOutput() noexcept = default;
+  inline explicit RawGnssAttitudeOutput(const point_one::fusion_engine::messages::RawGNSSAttitudeOutput& p) noexcept {
     solution_type = static_cast<int>(p.solution_type);
 
     baseline.x = p.relative_position_enu_m[0];
@@ -46,7 +48,8 @@ struct RawGnssAttitudeOutput : public fusion_engine_msgs::msg::RawGnssAttitudeOu
 };
 
 struct RawWheelSpeedOutput : public fusion_engine_msgs::msg::RawWheelSpeedOutput {
-  inline explicit RawWheelSpeedOutput(const point_one::fusion_engine::messages::RawWheelSpeedOutput& p) {
+  ~RawWheelSpeedOutput() noexcept = default;
+  inline explicit RawWheelSpeedOutput(const point_one::fusion_engine::messages::RawWheelSpeedOutput& p) noexcept {
     gear = static_cast<int>(p.gear);
 
     fl = (p.front_left_speed  == INT32_MAX) ? NAN : p.front_left_speed  / 1024.0;
@@ -57,14 +60,16 @@ struct RawWheelSpeedOutput : public fusion_engine_msgs::msg::RawWheelSpeedOutput
 };
 
 struct RawVehicleSpeedOutput : public fusion_engine_msgs::msg::RawVehicleSpeedOutput {
-  inline explicit RawVehicleSpeedOutput(const point_one::fusion_engine::messages::RawVehicleSpeedOutput& p) {
+  ~RawVehicleSpeedOutput() noexcept = default;
+  inline explicit RawVehicleSpeedOutput(const point_one::fusion_engine::messages::RawVehicleSpeedOutput& p) noexcept {
     gear = static_cast<int>(p.gear);
     speed = p.vehicle_speed;
   }
 };
 
 struct RawWheelTickOutput : public fusion_engine_msgs::msg::RawWheelTickOutput {
-  inline explicit RawWheelTickOutput(const point_one::fusion_engine::messages::RawWheelTickOutput& p) {
+  ~RawWheelTickOutput() noexcept = default;
+  inline explicit RawWheelTickOutput(const point_one::fusion_engine::messages::RawWheelTickOutput& p) noexcept {
     gear = static_cast<int>(p.gear);
     fl = p.front_left_wheel_ticks;
     fr = p.front_right_wheel_ticks;
@@ -74,7 +79,8 @@ struct RawWheelTickOutput : public fusion_engine_msgs::msg::RawWheelTickOutput {
 };
 
 struct RawVehicleTickOutput : public fusion_engine_msgs::msg::RawVehicleTickOutput {
-  inline explicit RawVehicleTickOutput(const point_one::fusion_engine::messages::RawVehicleTickOutput& p) {
+  ~RawVehicleTickOutput() noexcept = default;
+  inline explicit RawVehicleTickOutput(const point_one::fusion_engine::messages::RawVehicleTickOutput& p) noexcept {
     gear = static_cast<int>(p.gear);
     tick = p.tick_count;
   }
