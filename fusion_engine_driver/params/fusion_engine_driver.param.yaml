@@ -1,9 +1,12 @@
 /**:
   ros__parameters:
     connection_type: "tcp" # "tcp", "tty", or "udp"
-    ip: "10.42.7.211" # Only used if connection_type is "tcp"
+    ip: "10.42.7.211" # IP address (used for tcp/udp connection, or PCAP filtering if enable_pcap is true)
     port: 30200 # Only used if connection_type is "tcp" or "udp"
     device: "/dev/ttyUSB0" # Only used if connection_type is "tty"
     frame_id: "cg"
     debug: false
-
+    
+    # PCAP playback options (overrides normal connection if enabled)
+    enable_pcap: false
+    pcap_file: ""  # Path to PCAP file

@@ -33,6 +33,7 @@ find_package(mavros_msgs REQUIRED)
 find_package(nmea_msgs REQUIRED)
 find_package(fusion_engine_msgs REQUIRED)
 
+find_library(PCAP_LIBRARY pcap)
 include_directories(./core ./utils ./transport ./communication)
 
 set(SRC
@@ -42,10 +43,11 @@ set(SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/serial_port.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/tcp_listener.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/tty_listener.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/transport/pcap_listener.cpp
 )
 
 add_executable(fusion_engine_ros_driver ${SRC})
-target_link_libraries(fusion_engine_ros_driver fusion_engine_client)
+target_link_libraries(fusion_engine_ros_driver fusion_engine_client ${PCAP_LIBRARY})
 
 ament_target_dependencies(fusion_engine_ros_driver
   rclcpp

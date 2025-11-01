@@ -13,6 +13,7 @@
 
 #include "tcp_listener.hpp"
 #include "tty_listener.hpp"
+#include "pcap_listener.hpp"
 
 /**
  * For payload information and byte ordering, please reference:
@@ -60,6 +61,19 @@ public:
    * @param tty_port The targeted serial port.
    */
   void initialize(rclcpp::Node * node, const std::string & tty_port);
+
+  /**
+   * @brief Initialize the Fusion Engine interface with PCAP file playback.
+   *
+   * @param node The address of the node to be able to use the logging system
+   * provided by ROS.
+   * @param pcap_file Path to the PCAP file to read.
+   * @param filter_ip IP address to filter packets (empty string for no filtering).
+   */
+  void initialize(
+    rclcpp::Node * node,
+    const std::string & pcap_file,
+    const std::string & filter_ip);
 
   /**
    * Callback function for every new parsed message received from Atlas.

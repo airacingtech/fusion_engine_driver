@@ -47,6 +47,24 @@ void FusionEngineInterface::initialize(
 }
 
 /******************************************************************************/
+void FusionEngineInterface::initialize(
+  rclcpp::Node * node,
+  const std::string & pcap_file,
+  const std::string & filter_ip)
+{
+  this->node_ = node;
+  data_listener_ = std::make_shared < PcapListener > (
+    node_, pcap_file, filter_ip);
+  data_listener_->setCallback(
+    std::bind(
+      &FusionEngineInterface::decodeFusionEngineMessage, this,
+      std::placeholders::_1, std::placeholders::_2));
+  RCLCPP_INFO(
+    node_->get_logger(), "Initialize connection_type pcap from file %s",
+    pcap_file.c_str());
+}
+
+/******************************************************************************/
 void FusionEngineInterface::messageReceived(
   const MessageHeader & header,
   const void * payload_in)
