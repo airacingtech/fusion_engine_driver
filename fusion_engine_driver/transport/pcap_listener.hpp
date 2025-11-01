@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pcap/pcap.h>
+#include <termios.h>
 
 #include <csignal>
 #include <cstdio>
@@ -9,6 +10,8 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <atomic>
+#include <mutex>
 
 #include "data_listener.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -52,6 +55,11 @@ public:
   void listen();
 
   /**
+   * @brief Stops the PCAP playback and cleans up.
+   */
+  void stop() override;
+
+  /**
    * @brief Writes data (not supported for PCAP playback).
    *
    * @param data A pointer to the data to write.
@@ -66,6 +74,21 @@ private:
    * @return 0 on success, non-zero on error.
    */
   int open();
+
+  /**
+   * @brief Keyboard input handler thread.
+   */
+  void keyboardInputThread();
+
+  /**
+   * @brief Sets up terminal for raw input mode.
+   */
+  void setupTerminal();
+
+  /**
+   * @brief Restores terminal to original settings.
+   */
+  void restoreTerminal();
 
   /**
    * @brief Extracts UDP payload from a packet.
@@ -126,4 +149,49 @@ private:
    * @brief Timestamp from the last PCAP packet.
    */
   double last_pcap_timestamp_;
+
+  /**
+   * @brief Timestamp of the first PCAP packet (for relative time calculation).
+   */
+  double first_pcap_timestamp_;
+
+  /**
+   * @brief Current playback speed multiplier.
+   */
+  std::atomic<double> playback_speed_;
+
+  /**
+   * @brief Whether playback is currently paused.
+   */
+  std::atomic<bool> paused_;
+
+  /**
+   * @brief Target timestamp to seek to (in seconds).
+   */
+  std::atomic<double> seek_target_;
+
+  /**
+   * @brief Whether a seek operation is requested.
+   */
+  std::atomic<bool> seek_requested_;
+
+  /**
+   * @brief Keyboard input thread.
+   */
+  std::thread keyboard_thread_;
+
+  /**
+   * @brief Original terminal settings.
+   */
+  struct termios orig_termios_;
+
+  /**
+   * @brief TTY file descriptor for keyboard input.
+   */
+  int tty_fd_;
+
+  /**
+   * @brief Mutex for thread safety.
+   */
+  std::mutex control_mutex_;
 };
