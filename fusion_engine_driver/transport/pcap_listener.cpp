@@ -7,6 +7,8 @@
 #include <limits>
 #include <unistd.h>
 #include <fcntl.h>
+#include <vector>
+#include <algorithm>
 
 /******************************************************************************/
 PcapListener::PcapListener(
@@ -414,6 +416,7 @@ void PcapListener::listen()
               first_pcap_timestamp_ = ts;
               pcap_start_time = ts;
               first_packet = false;
+              // Recalculate target_absolute with the new first_pcap_timestamp_
               target_absolute = first_pcap_timestamp_ + target_relative;
             }
             

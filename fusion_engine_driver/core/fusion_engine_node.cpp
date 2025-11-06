@@ -93,7 +93,6 @@ void FusionEngineNode::handleFusionMessage(
   const MessageHeader & header,
   const void * payload)
 {
-  StatusResult status{Errors::noError};
   findHandler(header)(this, payload, frame_id_, this->now());
 // auto time = this->now();
 //  switch (header.message_type) {
