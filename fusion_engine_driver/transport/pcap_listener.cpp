@@ -1,15 +1,5 @@
 #include "pcap_listener.hpp"
 
-#include <netinet/ip.h>
-#include <netinet/udp.h>
-#include <netinet/tcp.h>
-#include <netinet/ether.h>
-#include <limits>
-#include <unistd.h>
-#include <fcntl.h>
-#include <vector>
-#include <algorithm>
-
 /******************************************************************************/
 PcapListener::PcapListener(
   rclcpp::Node * node,
