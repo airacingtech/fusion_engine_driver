@@ -182,6 +182,25 @@ inline const auto& kSBF()
              fusion_engine_msgs::msg::PVTCartesian>(
         n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian*>(p), id, t);
     }},
+    {SBFBlockID::PVTCartesian_v2, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
+      handle<::PVTCartesian_v2,
+             sbf_msgs::PVTCartesian,
+             fusion_engine_msgs::msg::PVTCartesian>(
+        n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian_v2*>(p), id, t);
+    }},
+    {SBFBlockID::PosCovGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
+      handle<::PosCovGeodetic,
+             sbf_msgs::PosCovGeodetic,
+             fusion_engine_msgs::msg::PosCovGeodetic>(
+        n, "pos_cov_geodetic", reinterpret_cast<const ::PosCovGeodetic*>(p), id, t);
+    }},
+    {SBFBlockID::VelCovGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
+      handle<::VelCovGeodetic,
+             sbf_msgs::VelCovGeodetic,
+             fusion_engine_msgs::msg::VelCovGeodetic>(
+        n, "vel_cov_geodetic", reinterpret_cast<const ::VelCovGeodetic*>(p), id, t);
+    }},
+
   };
   return kSBFHandles;
 }

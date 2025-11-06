@@ -131,6 +131,9 @@ struct PVTCartesian {
   uint8_t WACorrInfo;
 };
 
+// PVTCartesian_v2 (block 4006) uses the same structure as PVTCartesian (block 4002)
+using PVTCartesian_v2 = PVTCartesian;
+
 struct PVTGeodetic {
   uint32_t TOW;
   uint16_t WNc;
