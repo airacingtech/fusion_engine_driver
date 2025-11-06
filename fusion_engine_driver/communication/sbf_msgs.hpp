@@ -5,6 +5,8 @@
 
 #include "fusion_engine_msgs/msg/pvt_cartesian.hpp"
 #include "fusion_engine_msgs/msg/pvt_geodetic.hpp"
+#include "fusion_engine_msgs/msg/pos_cov_geodetic.hpp"
+#include "fusion_engine_msgs/msg/vel_cov_geodetic.hpp"
 
 namespace sbf_msgs {
 struct PVTCartesian : public fusion_engine_msgs::msg::PVTCartesian {
@@ -63,39 +65,33 @@ struct PVTGeodetic : public fusion_engine_msgs::msg::PVTGeodetic {
   }
 };
 
-// struct PosCovGeodetic : public fusion_engine_msgs::msg::PosCovGeodetic {
-//   ~PosCovGeodetic() noexcept = default;
-//   inline explicit PosCovGeodetic(const ::PosCovGeodetic& p) noexcept {
-//     tow_ms = p.TOW;
-//     week_number = p.WNc;
-//     position_covariance[0] = p.position_covariance[0];
-//     position_covariance[1] = p.position_covariance[1];
-//     position_covariance[2] = p.position_covariance[2];
-//     position_covariance[3] = p.position_covariance[3];
-//     position_covariance[4] = p.position_covariance[4];
-//     position_covariance[5] = p.position_covariance[5];
-//     position_covariance[6] = p.position_covariance[6];
-//     position_covariance[7] = p.position_covariance[7];
-//     position_covariance[8] = p.position_covariance[8];
-//   }
-// };
+struct PosCovGeodetic : public fusion_engine_msgs::msg::PosCovGeodetic {
+  ~PosCovGeodetic() noexcept = default;
+  inline explicit PosCovGeodetic(const ::PosCovGeodetic& p) noexcept {
+    tow_ms = p.TOW;
+    week_number = p.WNc;
+    cov_nn = p.Cov_NN;
+    cov_ne = p.Cov_NE;
+    cov_nu = p.Cov_NU;
+    cov_ee = p.Cov_EE;
+    cov_eu = p.Cov_EU;
+    cov_uu = p.Cov_UU;
+  }
+};
 
-// struct VelCovGeodetic : public fusion_engine_msgs::msg::VelCovGeodetic {
-//   ~VelCovGeodetic() noexcept = default;
-//   inline explicit VelCovGeodetic(const ::VelCovGeodetic& p) noexcept {
-//     tow_ms = p.TOW;
-//     week_number = p.WNc;
-//     velocity_covariance[0] = p.velocity_covariance[0];
-//     velocity_covariance[1] = p.velocity_covariance[1];
-//     velocity_covariance[2] = p.velocity_covariance[2];
-//     velocity_covariance[3] = p.velocity_covariance[3];
-//     velocity_covariance[4] = p.velocity_covariance[4];
-//     velocity_covariance[5] = p.velocity_covariance[5];
-//     velocity_covariance[6] = p.velocity_covariance[6];
-//     velocity_covariance[7] = p.velocity_covariance[7];
-//     velocity_covariance[8] = p.velocity_covariance[8];
-//   }
-// };
+struct VelCovGeodetic : public fusion_engine_msgs::msg::VelCovGeodetic {
+  ~VelCovGeodetic() noexcept = default;
+  inline explicit VelCovGeodetic(const ::VelCovGeodetic& p) noexcept {
+    tow_ms = p.TOW;
+    week_number = p.WNc;
+    cov_vn_vn = p.Cov_VnVn;
+    cov_vn_ve = p.Cov_VnVe;
+    cov_vn_vu = p.Cov_VnVu;
+    cov_ve_ve = p.Cov_VeVe;
+    cov_ve_vu = p.Cov_VeVu;
+    cov_vu_vu = p.Cov_VuVu;
+  }
+};
 }  // namespace sbf_msgs
 
 #endif  // FUSION_ENGINE_DRIVER__COMMUNICATION__SBF_MSGS_HPP_
