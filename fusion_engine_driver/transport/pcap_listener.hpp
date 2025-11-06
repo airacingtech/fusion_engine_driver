@@ -12,6 +12,15 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include "pcap_listener.hpp"
+
+#include <netinet/ip.h>
+#include <netinet/udp.h>
+#include <netinet/tcp.h>
+#include <netinet/ether.h>
+#include <limits>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "data_listener.hpp"
 #include "rclcpp/rclcpp.hpp"

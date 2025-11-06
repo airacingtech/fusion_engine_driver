@@ -174,13 +174,13 @@ inline const auto& kSBF()
       handle<::PVTGeodetic,
              sbf_msgs::PVTGeodetic,
              fusion_engine_msgs::msg::PVTGeodetic>(
-        n, "pvt_geodetic", reinterpret_cast<const ::PVTGeodetic*>(p + 8), id, t);
+        n, "pvt_geodetic", reinterpret_cast<const ::PVTGeodetic*>(p), id, t);
     }},
     {SBFBlockID::PVTCartesian, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
       handle<::PVTCartesian,
              sbf_msgs::PVTCartesian,
              fusion_engine_msgs::msg::PVTCartesian>(
-        n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian*>(p + 8), id, t);
+        n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian*>(p), id, t);
     }},
   };
   return kSBFHandles;
@@ -191,34 +191,37 @@ inline const Handler& findHandler(const MessageHeader& header)
 {
   const auto& table = kHandlers();
   static const Handler kNoOp = [](auto*, auto*, const std::string&, const rclcpp::Time&) {};
-  static const Handler kSBFOp = [header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
-    auto& contents = *reinterpret_cast<const point_one::fusion_engine::messages::InputDataWrapperMessage*>(p);
-    if (contents.data_type != static_cast<uint16_t>(InputDataType::SBF_DATA))
-      return;
-
-    const uint8_t* inner_payload = reinterpret_cast<const uint8_t*>(&contents) + sizeof(InputDataWrapperMessage);
-    const size_t inner_size = header.payload_size_bytes - sizeof(InputDataWrapperMessage);
-    if (!isSBF(inner_payload, inner_size))
-      return;
-
-    const uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
-    const uint16_t block_num = block_id & 0x1FFF;
-    const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
-    if (it != kSBF().end()) {
-      it->second(n, inner_payload + 8, f, t);
-    } else {
-
-      RCLCPP_DEBUG(n->get_logger(),
-                   "No registered SBF handler for block 0x%04X (%s)",
-                   block_num, to_string(block_num).c_str());
-    }
-  };
 
   const auto it = table.find(header.message_type);
   if (it != table.end())
     return it->second;
-  if (header.message_type == MessageType::INPUT_DATA_WRAPPER)
+  
+  if (header.message_type == MessageType::INPUT_DATA_WRAPPER) {
+    static Handler kSBFOp;
+    kSBFOp = [&header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
+      auto& contents = *reinterpret_cast<const point_one::fusion_engine::messages::InputDataWrapperMessage*>(p);
+      if (contents.data_type != static_cast<uint16_t>(InputDataType::SBF_DATA))
+        return;
+
+      const uint8_t* inner_payload = reinterpret_cast<const uint8_t*>(p) + sizeof(InputDataWrapperMessage);
+      const size_t inner_size = header.payload_size_bytes - sizeof(InputDataWrapperMessage);
+      if (!isSBF(inner_payload, inner_size))
+        return;
+
+      const uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
+      const uint16_t block_num = block_id & 0x1FFF;
+      const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
+      if (it != kSBF().end()) {
+        it->second(n, inner_payload + 8, f, t);
+      } else {
+        RCLCPP_DEBUG(n->get_logger(),
+                     "No registered SBF handler for block 0x%04X (%s)",
+                     block_num, to_string(block_num).c_str());
+      }
+    };
     return kSBFOp;
+  }
+  
   return kNoOp;
 }
 
