@@ -210,7 +210,7 @@ inline const Handler& findHandler(const MessageHeader& header)
 
       const uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
       const uint16_t block_num = block_id & 0x1FFF;
-      RCLCPP_INFO(n->get_logger(), "SBF Block ID: 0x%04X", to_string(block_num));
+      RCLCPP_INFO(n->get_logger(), "SBF Block %s", to_string(block_num).c_str());
       const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
       if (it != kSBF().end()) {
         it->second(n, inner_payload + 8, f, t);
