@@ -36,8 +36,8 @@ struct PVTGeodetic : public fusion_engine_msgs::msg::PVTGeodetic {
     week_number = p.WNc;
     time_system = p.timeSystem;
     datum = p.datum;
-    latitude = p.latitude;
-    longitude = p.longitude;
+    latitude = p.latitude * 180.0 / M_PI;
+    longitude = p.longitude * 180.0 / M_PI;
     height = p.height;
     undulation = p.undulation;
     north_velocity = p.vn;
