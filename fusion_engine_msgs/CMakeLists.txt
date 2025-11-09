@@ -27,8 +27,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/raw/RawGnssAttitudeOutput.msg"
   "msg/septentrio/PVTCartesian.msg"
   "msg/septentrio/PVTGeodetic.msg"
-  "msg/septentrio/PosCovGeodetic.msg"
-  "msg/septentrio/VelCovGeodetic.msg"
   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
 )
 

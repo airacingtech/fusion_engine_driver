@@ -2,11 +2,9 @@
 #define FUSION_ENGINE_DRIVER__COMMUNICATION__SBF_MSGS_HPP_
 
 #include "sbf_typedefs.hpp"
-
+#include "sbf_utils.hpp"
 #include "fusion_engine_msgs/msg/pvt_cartesian.hpp"
 #include "fusion_engine_msgs/msg/pvt_geodetic.hpp"
-#include "fusion_engine_msgs/msg/pos_cov_geodetic.hpp"
-#include "fusion_engine_msgs/msg/vel_cov_geodetic.hpp"
 
 namespace sbf_msgs {
 struct PVTCartesian : public fusion_engine_msgs::msg::PVTCartesian {
@@ -65,33 +63,6 @@ struct PVTGeodetic : public fusion_engine_msgs::msg::PVTGeodetic {
   }
 };
 
-struct PosCovGeodetic : public fusion_engine_msgs::msg::PosCovGeodetic {
-  ~PosCovGeodetic() noexcept = default;
-  inline explicit PosCovGeodetic(const ::PosCovGeodetic& p) noexcept {
-    tow_ms = p.TOW;
-    week_number = p.WNc;
-    cov_nn = p.Cov_NN;
-    cov_ne = p.Cov_NE;
-    cov_nu = p.Cov_NU;
-    cov_ee = p.Cov_EE;
-    cov_eu = p.Cov_EU;
-    cov_uu = p.Cov_UU;
-  }
-};
-
-struct VelCovGeodetic : public fusion_engine_msgs::msg::VelCovGeodetic {
-  ~VelCovGeodetic() noexcept = default;
-  inline explicit VelCovGeodetic(const ::VelCovGeodetic& p) noexcept {
-    tow_ms = p.TOW;
-    week_number = p.WNc;
-    cov_vn_vn = p.Cov_VnVn;
-    cov_vn_ve = p.Cov_VnVe;
-    cov_vn_vu = p.Cov_VnVu;
-    cov_ve_ve = p.Cov_VeVe;
-    cov_ve_vu = p.Cov_VeVu;
-    cov_vu_vu = p.Cov_VuVu;
-  }
-};
 }  // namespace sbf_msgs
 
 #endif  // FUSION_ENGINE_DRIVER__COMMUNICATION__SBF_MSGS_HPP_

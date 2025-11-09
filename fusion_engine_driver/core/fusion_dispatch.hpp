@@ -182,25 +182,6 @@ inline const auto& kSBF()
              fusion_engine_msgs::msg::PVTCartesian>(
         n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian*>(p), id, t);
     }},
-    {SBFBlockID::PVTCartesian_v2, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-      handle<::PVTCartesian_v2,
-             sbf_msgs::PVTCartesian,
-             fusion_engine_msgs::msg::PVTCartesian>(
-        n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian_v2*>(p), id, t);
-    }},
-    {SBFBlockID::PosCovGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-      handle<::PosCovGeodetic,
-             sbf_msgs::PosCovGeodetic,
-             fusion_engine_msgs::msg::PosCovGeodetic>(
-        n, "pos_cov_geodetic", reinterpret_cast<const ::PosCovGeodetic*>(p), id, t);
-    }},
-    {SBFBlockID::VelCovGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-      handle<::VelCovGeodetic,
-             sbf_msgs::VelCovGeodetic,
-             fusion_engine_msgs::msg::VelCovGeodetic>(
-        n, "vel_cov_geodetic", reinterpret_cast<const ::VelCovGeodetic*>(p), id, t);
-    }},
-
   };
   return kSBFHandles;
 }
@@ -229,7 +210,6 @@ inline const Handler& findHandler(const MessageHeader& header)
 
       const uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
       const uint16_t block_num = block_id & 0x1FFF;
-      RCLCPP_INFO(n->get_logger(), "SBF Block %s", to_string(block_num).c_str());
       const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
       if (it != kSBF().end()) {
         it->second(n, inner_payload + 8, f, t);
