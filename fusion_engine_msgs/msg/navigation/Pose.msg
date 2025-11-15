@@ -14,8 +14,8 @@ float32[9] position_covariance
 fusion_engine_msgs/RPY rpy
 float32[9] rpy_covariance
 
-geometry_msgs/Vector3 velocity_flu
-float32[9] velocity_flu_covariance
+geometry_msgs/Vector3 velflu
+float32[9] velflu_covariance
 
 float32 aggregate_protection_level
 float32 horizontal_protection_level

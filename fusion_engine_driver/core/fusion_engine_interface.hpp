@@ -1,38 +1,20 @@
-// Copyright 2025 AI Racing Tech
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+#ifndef FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_INTERFACE_HPP_
+#define FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_INTERFACE_HPP_
 
-#pragma once
-
-#include <point_one/fusion_engine/messages/core.h>
-#include <point_one/fusion_engine/messages/ros.h>
 #include <point_one/fusion_engine/parsers/fusion_engine_framer.h>
+#include "fusion_dispatch.hpp"
 
 #include <string>
 #include <memory>
 #include <cstdio>
 #include <vector>
 
-#include "conversion_utils.hpp"
-#include "gps_msgs/msg/gps_fix.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "sensor_msgs/msg/imu.hpp"
-#include "std_msgs/msg/string.hpp"
+
 #include "tcp_listener.hpp"
 #include "tty_listener.hpp"
+#include "pcap_listener.hpp"
 
-using namespace point_one::fusion_engine::messages;
-using namespace point_one::fusion_engine::messages::ros;
 /**
  * For payload information and byte ordering, please reference:
  * https://pointonenav.com/wp-content/uploads/2025/08/FusionEngine-Message-Specification-0.23.pdf
@@ -81,16 +63,24 @@ public:
   void initialize(rclcpp::Node * node, const std::string & tty_port);
 
   /**
+   * @brief Initialize the Fusion Engine interface with PCAP file playback.
+   *
+   * @param node The address of the node to be able to use the logging system
+   * provided by ROS.
+   * @param pcap_file Path to the PCAP file to read.
+   * @param filter_ip IP address to filter packets (empty string for no filtering).
+   */
+  void initialize(
+    rclcpp::Node * node,
+    const std::string & pcap_file,
+    const std::string & filter_ip);
+
+  /**
    * Callback function for every new parsed message received from Atlas.
    * @param header Metadata on payload.
    * @param payload_in Message received.
    */
   void messageReceived(const MessageHeader & header, const void * payload_in);
-
-  /**
-   * Helper function for dumping raw tcp hex values
-   */
-  void dumpHex(const MessageHeader & header, const uint8_t * payload, MessageType type);
 
   /**
    * @brief Call fusion engine decoder.
@@ -168,3 +158,5 @@ private:
    */
   std::shared_ptr<DataListener> data_listener_;
 };
+
+#endif  // FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_INTERFACE_HPP_

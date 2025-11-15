@@ -14,6 +14,7 @@ def generate_launch_description():
         executable="fusion_engine_ros_driver",
         name="fusion_engine_node",
         output="screen",
+        arguments=['--ros-args', '--log-level', 'debug'],
         parameters=[param_file_path],
         remappings=[
             # Navigation Solutions (FusionEngine)
