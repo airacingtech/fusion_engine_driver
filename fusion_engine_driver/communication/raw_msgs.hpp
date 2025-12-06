@@ -24,11 +24,11 @@ struct RawImu : public sensor_msgs::msg::Imu {
       static_cast<double>(p.accel[2]) / 65536.0;
 
     angular_velocity.x = (p.gyro[0] == INT32_MAX) ? NAN :
-      static_cast<double>(p.gyro[0]) / 65536.0;
+      static_cast<double>(p.gyro[0]) / 1048576.0;
     angular_velocity.y = (p.gyro[1] == INT32_MAX) ? NAN :
-      static_cast<double>(p.gyro[1]) / 65536.0;
+      static_cast<double>(p.gyro[1]) / 1048576.0;
     angular_velocity.z = (p.gyro[2] == INT32_MAX) ? NAN :
-      static_cast<double>(p.gyro[2]) / 65536.0;
+      static_cast<double>(p.gyro[2]) / 1048576.0;
   }
 };
 
