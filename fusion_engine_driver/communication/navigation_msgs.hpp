@@ -7,7 +7,6 @@
 #include "fusion_engine_msgs/msg/relative_enu_position.hpp"
 #include "fusion_engine_msgs/msg/gnss_info.hpp"
 #include "fusion_engine_msgs/msg/gnss_signals.hpp"
-#include "fusion_engine_msgs/msg/gnss_satellite.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
 #include "fusion_engine_msgs/msg/gnss_signal_info.hpp"
 
