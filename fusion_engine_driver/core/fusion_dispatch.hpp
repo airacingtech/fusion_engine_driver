@@ -47,6 +47,59 @@ inline void handle(rclcpp::Node* node,
 }
 
 /******************************************************************************/
+inline void handleGnssSignals(rclcpp::Node* node,
+                              const MessageHeader& header,
+                              const void* payload,
+                              const std::string& frame_id,
+                              const rclcpp::Time& stamp)
+{
+  static auto pub = node->create_publisher<fusion_engine_msgs::msg::GnssSignals>(
+    "gnss_signal", rclcpp::SensorDataQoS());
+
+  const auto* base =
+    reinterpret_cast<const point_one::fusion_engine::messages::GNSSSignalsMessage*>(payload);
+  const size_t base_size = sizeof(point_one::fusion_engine::messages::GNSSSignalsMessage);
+  const size_t sat_size = sizeof(point_one::fusion_engine::messages::GNSSSatelliteInfo);
+  const size_t sig_size = sizeof(point_one::fusion_engine::messages::GNSSSignalInfo);
+  const size_t expected_size =
+    base_size +
+    (static_cast<size_t>(base->num_satellites) * sat_size) +
+    (static_cast<size_t>(base->num_signals) * sig_size);
+
+  if (header.payload_size_bytes < base_size || header.payload_size_bytes < expected_size) {
+    RCLCPP_WARN(node->get_logger(),
+                "GNSS_SIGNALS payload too small (size=%u expected>=%zu).",
+                header.payload_size_bytes, expected_size);
+    return;
+  }
+
+  navigation_msgs::GnssSignals msg{*base};
+  msg.header.frame_id = frame_id;
+  msg.header.stamp = stamp;
+
+  const uint8_t* data = reinterpret_cast<const uint8_t*>(payload);
+  const auto* sats = reinterpret_cast<const point_one::fusion_engine::messages::GNSSSatelliteInfo*>(
+    data + base_size);
+  msg.satellites.reserve(base->num_satellites);
+  for (size_t i = 0; i < base->num_satellites; ++i) {
+    navigation_msgs::GnssSatelliteInfo sat_msg{sats[i]};
+    msg.satellites.push_back(
+      static_cast<const fusion_engine_msgs::msg::GnssSatelliteInfo&>(sat_msg));
+  }
+
+  const auto* sigs = reinterpret_cast<const point_one::fusion_engine::messages::GNSSSignalInfo*>(
+    data + base_size + (static_cast<size_t>(base->num_satellites) * sat_size));
+  msg.signals.reserve(base->num_signals);
+  for (size_t i = 0; i < base->num_signals; ++i) {
+    navigation_msgs::GnssSignalInfo sig_msg{sigs[i]};
+    msg.signals.push_back(
+      static_cast<const fusion_engine_msgs::msg::GnssSignalInfo&>(sig_msg));
+  }
+
+  pub->publish(static_cast<const fusion_engine_msgs::msg::GnssSignals&>(msg));
+}
+
+/******************************************************************************/
 inline const auto& kHandlers()
 {
   static const std::unordered_map<MessageType, Handler> kHandles = {
@@ -78,13 +131,6 @@ inline const auto& kHandlers()
              fusion_engine_msgs::msg::GnssInfo>(
         n, "gnss_info",
         reinterpret_cast<const point_one::fusion_engine::messages::GNSSInfoMessage*>(p), id, t);
-    }},
-    {MessageType::GNSS_SATELLITE, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-      handle<point_one::fusion_engine::messages::GNSSSatelliteMessage,
-             navigation_msgs::GnssSatellite,
-             fusion_engine_msgs::msg::GnssSatellite>(
-        n, "gnss_satellite",
-        reinterpret_cast<const point_one::fusion_engine::messages::GNSSSatelliteMessage*>(p), id, t);
     }},
     {MessageType::RELATIVE_ENU_POSITION, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
       handle<point_one::fusion_engine::messages::RelativeENUPositionMessage,
@@ -189,9 +235,17 @@ inline const auto& kSBF()
 /******************************************************************************/
 inline const Handler& findHandler(const MessageHeader& header)
 {
-  const auto& table = kHandlers();
   static const Handler kNoOp = [](auto*, auto*, const std::string&, const rclcpp::Time&) {};
 
+  if (header.message_type == MessageType::GNSS_SIGNALS) {
+    static Handler kGnssSignalsOp;
+    kGnssSignalsOp = [&header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
+      handleGnssSignals(n, header, p, f, t);
+    };
+    return kGnssSignalsOp;
+  }
+
+  const auto& table = kHandlers();
   const auto it = table.find(header.message_type);
   if (it != table.end())
     return it->second;

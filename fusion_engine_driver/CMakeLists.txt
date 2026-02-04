@@ -8,7 +8,6 @@ endif()
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set(P1_FE_BUILD_EXAMPLES OFF)
-
 include(FetchContent)
 
 FetchContent_Declare(

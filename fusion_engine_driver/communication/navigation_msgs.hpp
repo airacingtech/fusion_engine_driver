@@ -6,8 +6,11 @@
 #include "fusion_engine_msgs/msg/calibration_status.hpp"
 #include "fusion_engine_msgs/msg/relative_enu_position.hpp"
 #include "fusion_engine_msgs/msg/gnss_info.hpp"
-#include "fusion_engine_msgs/msg/gnss_satellite.hpp"
+#include "fusion_engine_msgs/msg/gnss_signals.hpp"
 #include "fusion_engine_msgs/msg/gnss_satellite_info.hpp"
+#include "fusion_engine_msgs/msg/gnss_signal_info.hpp"
+
+#include <cmath>
 
 namespace navigation_msgs {
 struct Pose : public fusion_engine_msgs::msg::Pose {
@@ -103,24 +106,49 @@ struct GnssInfo : public fusion_engine_msgs::msg::GnssInfo {
 
 struct GnssSatelliteInfo : public fusion_engine_msgs::msg::GnssSatelliteInfo {
   ~GnssSatelliteInfo() noexcept = default;
-  inline explicit GnssSatelliteInfo(const point_one::fusion_engine::messages::SatelliteInfo& sat) noexcept {
+  inline explicit GnssSatelliteInfo(
+    const point_one::fusion_engine::messages::GNSSSatelliteInfo& sat) noexcept
+  {
+    system = static_cast<uint8_t>(sat.system);
     prn = sat.prn;
-    constellation = static_cast<uint8_t>(sat.system);
-    cn0 = sat.cn0;
-    elevation = sat.elevation_deg;
-    azimuth = sat.azimuth_deg;
-    usage = sat.usage;
+    usage = sat.status_flags;
+
+    if (sat.elevation_cdeg == point_one::fusion_engine::messages::GNSSSatelliteInfo::INVALID_ELEVATION) {
+      elevation = NAN;
+    } else {
+      elevation = static_cast<double>(sat.elevation_cdeg) * 0.01;
+    }
+
+    if (sat.azimuth_cdeg == point_one::fusion_engine::messages::GNSSSatelliteInfo::INVALID_AZIMUTH) {
+      azimuth = NAN;
+    } else {
+      azimuth = static_cast<double>(sat.azimuth_cdeg) * 0.01;
+    }
   }
 };
 
-struct GnssSatellite : public fusion_engine_msgs::msg::GnssSatellite {
-  ~GnssSatellite() noexcept = default;
-  inline explicit GnssSatellite(const point_one::fusion_engine::messages::GNSSSatelliteMessage& p) noexcept {
+struct GnssSignalInfo : public fusion_engine_msgs::msg::GnssSignalInfo {
+  ~GnssSignalInfo() noexcept = default;
+  inline explicit GnssSignalInfo(
+    const point_one::fusion_engine::messages::GNSSSignalInfo& sig) noexcept
+  {
+    signal_type = static_cast<uint8_t>(sig.signal_type);
+    prn = sig.prn;
+    cn0 = sig.cn0 * 0.25f;
+    status_flags = sig.status_flags;
+  }
+};
+
+struct GnssSignals : public fusion_engine_msgs::msg::GnssSignals {
+  ~GnssSignals() noexcept = default;
+  inline explicit GnssSignals(const point_one::fusion_engine::messages::GNSSSignalsMessage& p) noexcept {
     p1_time.seconds = p.p1_time.seconds;
     p1_time.fraction_ns = p.p1_time.fraction_ns;
     gps_time.seconds = p.gps_time.seconds;
     gps_time.fraction_ns = p.gps_time.fraction_ns;
-
+    gps_tow_ms = p.gps_tow_ms;
+    gps_week = p.gps_week;
+    num_signals = p.num_signals;
     num_satellites = p.num_satellites;
   }
 };

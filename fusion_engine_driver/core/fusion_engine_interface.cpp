@@ -70,6 +70,8 @@ void FusionEngineInterface::messageReceived(
   const void * payload_in)
 {
   auto payload = static_cast < const uint8_t * > (payload_in);
+  // if(header.message_type == point_one::fusion_engine::messages::MessageType::GNSS_SIGNALS)
+  //   Helper::dumpHex(this->node_->get_logger(), payload, header.payload_size_bytes, "Transmitted Message");
   publisher(header, payload);
 }
 

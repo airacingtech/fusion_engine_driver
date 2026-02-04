@@ -2,6 +2,7 @@
 #define FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_INTERFACE_HPP_
 
 #include <point_one/fusion_engine/parsers/fusion_engine_framer.h>
+#include "point_one/fusion_engine/messages/signal_defs.h"
 #include "fusion_dispatch.hpp"
 
 #include <string>
