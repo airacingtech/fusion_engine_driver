@@ -27,8 +27,7 @@ using namespace point_one::fusion_engine::messages;
 using namespace point_one::fusion_engine::messages::ros;
 
 using Handler = std::function<void(rclcpp::Node*, const void*, const std::string&, const rclcpp::Time&)>;
-using SBFHandler = std::function<void(rclcpp::Node*, const uint8_t*, const std::string&, const rclcpp::Time&)>;
-
+using SBFHandler = std::function<void(rclcpp::Node*, const uint8_t*, size_t, const std::string&, const rclcpp::Time&)>;
 /******************************************************************************/
 template <typename SrcT, typename MsgT, typename DstT>
 inline void handle(rclcpp::Node* node,
@@ -216,33 +215,31 @@ inline const auto& kHandlers()
 inline const auto& kSBF()
 {
   static const std::unordered_map<SBFBlockID, SBFHandler> kSBFHandles = {
-    {SBFBlockID::PVTGeodetic, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-      handle<::PVTGeodetic,
-             sbf_msgs::PVTGeodetic,
-             fusion_engine_msgs::msg::PVTGeodetic>(
-        n, "pvt_geodetic", reinterpret_cast<const ::PVTGeodetic*>(p), id, t);
-    }},
-    {SBFBlockID::PVTCartesian, [](auto* n, auto* p, const std::string& id, const rclcpp::Time& t){
-      handle<::PVTCartesian,
-             sbf_msgs::PVTCartesian,
-             fusion_engine_msgs::msg::PVTCartesian>(
-        n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian*>(p), id, t);
-    }},
+    {SBFBlockID::PVTGeodetic,
+     [](auto* n, auto* p, size_t length, const std::string& id, const rclcpp::Time& t) {
+       if (length < sizeof(::PVTGeodetic)) return;
+       handle<::PVTGeodetic, sbf_msgs::PVTGeodetic, fusion_engine_msgs::msg::PVTGeodetic>(
+         n, "pvt_geodetic", reinterpret_cast<const ::PVTGeodetic*>(p), id, t);
+     }},
+    {SBFBlockID::PVTCartesian,
+     [](auto* n, auto* p, size_t length, const std::string& id, const rclcpp::Time& t) {
+       if (length < sizeof(::PVTCartesian)) return;
+       handle<::PVTCartesian, sbf_msgs::PVTCartesian, fusion_engine_msgs::msg::PVTCartesian>(
+         n, "pvt_cartesian", reinterpret_cast<const ::PVTCartesian*>(p), id, t);
+     }},
   };
   return kSBFHandles;
 }
 
 /******************************************************************************/
-inline const Handler& findHandler(const MessageHeader& header)
+inline Handler findHandler(const MessageHeader& header)
 {
   static const Handler kNoOp = [](auto*, auto*, const std::string&, const rclcpp::Time&) {};
 
   if (header.message_type == MessageType::GNSS_SIGNALS) {
-    static Handler kGnssSignalsOp;
-    kGnssSignalsOp = [&header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
+    return [header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
       handleGnssSignals(n, header, p, f, t);
     };
-    return kGnssSignalsOp;
   }
 
   const auto& table = kHandlers();
@@ -250,30 +247,47 @@ inline const Handler& findHandler(const MessageHeader& header)
   if (it != table.end())
     return it->second;
   
-  if (header.message_type == MessageType::INPUT_DATA_WRAPPER) {
-    static Handler kSBFOp;
-    kSBFOp = [&header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
-      auto& contents = *reinterpret_cast<const point_one::fusion_engine::messages::InputDataWrapperMessage*>(p);
+    if (header.message_type == MessageType::INPUT_DATA_WRAPPER) {
+    return [header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
+
+      if (header.payload_size_bytes < sizeof(InputDataWrapperMessage))
+        return;
+
+      const auto& contents =
+        *reinterpret_cast<const InputDataWrapperMessage*>(p);
+
       if (contents.data_type != static_cast<uint16_t>(InputDataType::SBF_DATA))
         return;
 
-      const uint8_t* inner_payload = reinterpret_cast<const uint8_t*>(p) + sizeof(InputDataWrapperMessage);
-      const size_t inner_size = header.payload_size_bytes - sizeof(InputDataWrapperMessage);
+      const uint8_t* inner_payload =
+        reinterpret_cast<const uint8_t*>(p) + sizeof(InputDataWrapperMessage);
+
+      const size_t inner_size =
+        header.payload_size_bytes - sizeof(InputDataWrapperMessage);
+
       if (!isSBF(inner_payload, inner_size))
         return;
 
-      const uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
+      const uint16_t block_length =
+        inner_payload[6] | (inner_payload[7] << 8);
+
+      if (block_length < 8 || block_length > inner_size)
+        return;
+
+      const uint16_t block_id =
+        inner_payload[4] | (inner_payload[5] << 8);
+
       const uint16_t block_num = block_id & 0x1FFF;
+
       const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
-      if (it != kSBF().end()) {
-        it->second(n, inner_payload + 8, f, t);
-      } else {
-        RCLCPP_DEBUG(n->get_logger(),
-                     "No registered SBF handler for block 0x%04X (%s)",
-                     block_num, to_string(block_num).c_str());
-      }
+      if (it == kSBF().end())
+        return;
+
+      const uint8_t* sbf_payload = inner_payload + 8;
+      const size_t sbf_payload_size = static_cast<size_t>(block_length) - 8;
+
+      it->second(n, sbf_payload, sbf_payload_size, f, t);
     };
-    return kSBFOp;
   }
   
   return kNoOp;
