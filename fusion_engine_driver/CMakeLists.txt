@@ -45,10 +45,10 @@ set(SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/pcap_listener.cpp
 )
 
-add_executable(fusion_engine_ros_driver ${SRC})
-target_link_libraries(fusion_engine_ros_driver fusion_engine_client ${PCAP_LIBRARY})
+add_library(${PROJECT_NAME}_node SHARED ${SRC})
+target_link_libraries(${PROJECT_NAME}_node fusion_engine_client ${PCAP_LIBRARY})
 
-ament_target_dependencies(fusion_engine_ros_driver
+ament_target_dependencies(${PROJECT_NAME}_node
   rclcpp
   rclcpp_components
   std_msgs
@@ -61,8 +61,15 @@ ament_target_dependencies(fusion_engine_ros_driver
   fusion_engine_msgs
 )
 
-install(TARGETS fusion_engine_ros_driver
-  DESTINATION lib/${PROJECT_NAME}
+rclcpp_components_register_node(${PROJECT_NAME}_node
+  PLUGIN "FusionEngineNode"
+  EXECUTABLE fusion_engine_ros_driver
+)
+
+install(TARGETS ${PROJECT_NAME}_node
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 install(DIRECTORY params launch
