@@ -15,7 +15,7 @@
 class FusionEngineNode : public rclcpp::Node
 {
 public:
-  FusionEngineNode();
+  explicit FusionEngineNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
   ~FusionEngineNode();
 
   void handleFusionMessage(

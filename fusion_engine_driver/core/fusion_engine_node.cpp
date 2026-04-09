@@ -2,8 +2,8 @@
 #include <limits>
 
 /******************************************************************************/
-FusionEngineNode::FusionEngineNode()
-: Node("fusion_engine_node"),
+FusionEngineNode::FusionEngineNode(const rclcpp::NodeOptions & options)
+: Node("fusion_engine_node", options),
   fe_interface_(std::bind(&FusionEngineNode::handleFusionMessage,
     this, std::placeholders::_1,
     std::placeholders::_2))
