@@ -234,18 +234,29 @@ inline const auto& kSBF()
 
 /******************************************************************************/
 // Pull the device measurement time (p1_time, seconds) out of a payload for the
-// message types that carry it as their first member (empty MessagePayload base
-// => p1_time sits at payload offset 0). These high-rate solution/measurement
-// messages drive the clock-sync estimator; anything else keeps receipt time.
+// message types that carry `Timestamp p1_time` as their first member (empty
+// MessagePayload base => it sits at payload offset 0). All feed one P1 clock,
+// so they share the estimator cleanly. NOTE: RAW_IMU_OUTPUT / GNSS_ATTITUDE_OUTPUT
+// lead with MeasurementDetails.measurement_time, which is a DIFFERENT time base
+// (needs measurement_time_source conversion) -- feeding it raw poisons the shared
+// offset, so those keep receipt time until converted properly.
 inline bool extractP1TimeSeconds(const MessageHeader& header,
                                  const void* payload,
                                  double& out)
 {
   switch (header.message_type) {
     case MessageType::POSE:
-    case MessageType::IMU_OUTPUT:
+    case MessageType::POSE_AUX:
+    case MessageType::CALIBRATION_STATUS:
     case MessageType::GNSS_INFO:
+    case MessageType::GNSS_SIGNALS:
     case MessageType::RELATIVE_ENU_POSITION:
+    case MessageType::IMU_OUTPUT:
+    case MessageType::WHEEL_SPEED_OUTPUT:
+    case MessageType::VEHICLE_SPEED_OUTPUT:
+    case MessageType::ROS_POSE:
+    case MessageType::ROS_GPS_FIX:
+    case MessageType::ROS_IMU:
       break;
     default:
       return false;
