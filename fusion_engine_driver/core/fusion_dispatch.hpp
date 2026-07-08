@@ -233,6 +233,33 @@ inline const auto& kSBF()
 }
 
 /******************************************************************************/
+// Pull the device measurement time (p1_time, seconds) out of a payload for the
+// message types that carry it as their first member (empty MessagePayload base
+// => p1_time sits at payload offset 0). These high-rate solution/measurement
+// messages drive the clock-sync estimator; anything else keeps receipt time.
+inline bool extractP1TimeSeconds(const MessageHeader& header,
+                                 const void* payload,
+                                 double& out)
+{
+  switch (header.message_type) {
+    case MessageType::POSE:
+    case MessageType::IMU_OUTPUT:
+    case MessageType::GNSS_INFO:
+    case MessageType::RELATIVE_ENU_POSITION:
+      break;
+    default:
+      return false;
+  }
+  const auto* ts = reinterpret_cast<const Timestamp*>(payload);
+  if (ts->seconds == Timestamp::INVALID) {
+    return false;
+  }
+  out = static_cast<double>(ts->seconds) +
+        static_cast<double>(ts->fraction_ns) * 1e-9;
+  return true;
+}
+
+/******************************************************************************/
 inline const Handler& findHandler(const MessageHeader& header)
 {
   static const Handler kNoOp = [](auto*, auto*, const std::string&, const rclcpp::Time&) {};

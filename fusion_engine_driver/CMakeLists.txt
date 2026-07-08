@@ -41,6 +41,7 @@ set(SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/core/fusion_engine_interface.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/serial_port.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/tcp_listener.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/transport/udp_listener.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/tty_listener.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/transport/pcap_listener.cpp
 )
@@ -81,6 +82,11 @@ if(BUILD_TESTING)
   set(ament_cmake_copyright_FOUND TRUE)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_clock_sync test/test_clock_sync.cpp)
+  target_include_directories(test_clock_sync PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils)
 endif()
 
 ament_export_dependencies(rosidl_default_runtime)

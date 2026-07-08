@@ -16,18 +16,23 @@ FusionEngineInterface::FusionEngineInterface(
 /******************************************************************************/
 void FusionEngineInterface::initialize(
   rclcpp::Node * node,
-  const std::string & tcp_ip,
-  int tcp_port)
+  const std::string & ip,
+  int port,
+  const std::string & protocol)
 {
   this->node_ = node;
-  data_listener_ = std::make_shared < TcpListener > (node_, tcp_ip, tcp_port);
+  if (protocol == "udp") {
+    data_listener_ = std::make_shared < UdpListener > (node_, ip, port);
+  } else {
+    data_listener_ = std::make_shared < TcpListener > (node_, ip, port);
+  }
   data_listener_->setCallback(
     std::bind(
       &FusionEngineInterface::decodeFusionEngineMessage, this,
       std::placeholders::_1, std::placeholders::_2));
   RCLCPP_INFO(
-    node_->get_logger(), "Initialize connection_type tcp in port %d",
-    tcp_port);
+    node_->get_logger(), "Initialize connection_type %s on port %d",
+    protocol.c_str(), port);
 }
 
 /******************************************************************************/

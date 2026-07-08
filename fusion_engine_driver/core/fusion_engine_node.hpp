@@ -11,6 +11,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "fusion_engine_interface.hpp"
 #include "errors.hpp"
+#include "clock_sync.hpp"
 
 class FusionEngineNode : public rclcpp::Node
 {
@@ -42,6 +43,8 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
 
   std::string frame_id_;
+
+  std::unique_ptr<art::ClockSync> clock_sync_;
 
 
   std::thread listener_thread_;
