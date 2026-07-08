@@ -19,7 +19,7 @@
 
 enum class InputDataType : uint16_t {
   UNKNOWN           = 0x0000,
-  SBF_DATA          = 0x00A1,  // Septentrio Binary Format
+  SBF_DATA          = 0x00B8,  // Septentrio Binary Format (observed PointOne data_type)
 };
 
 enum class SBFBlockID : uint16_t {
