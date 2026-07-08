@@ -233,17 +233,19 @@ inline const auto& kSBF()
 }
 
 /******************************************************************************/
-// Pull the device measurement time (p1_time, seconds) out of a payload for the
-// message types that carry `Timestamp p1_time` as their first member (empty
-// MessagePayload base => it sits at payload offset 0). All feed one P1 clock,
-// so they share the estimator cleanly. NOTE: RAW_IMU_OUTPUT / GNSS_ATTITUDE_OUTPUT
-// lead with MeasurementDetails.measurement_time, which is a DIFFERENT time base
-// (needs measurement_time_source conversion) -- feeding it raw poisons the shared
-// offset, so those keep receipt time until converted properly.
+// Pull the device P1 time (seconds) out of a payload. Two payload shapes carry it,
+// both on the same P1 clock so they share the estimator cleanly:
+//   - most measurement messages lead with `Timestamp p1_time` at offset 0
+//     (empty MessagePayload base);
+//   - RAW_IMU_OUTPUT / GNSS_ATTITUDE_OUTPUT lead with `MeasurementDetails details`,
+//     whose `p1_time` field we read (NOT its leading `measurement_time`, which is a
+//     source-dependent base that would poison the shared offset).
+// Types without either keep receipt time.
 inline bool extractP1TimeSeconds(const MessageHeader& header,
                                  const void* payload,
                                  double& out)
 {
+  const Timestamp* ts = nullptr;
   switch (header.message_type) {
     case MessageType::POSE:
     case MessageType::POSE_AUX:
@@ -257,11 +259,15 @@ inline bool extractP1TimeSeconds(const MessageHeader& header,
     case MessageType::ROS_POSE:
     case MessageType::ROS_GPS_FIX:
     case MessageType::ROS_IMU:
+      ts = reinterpret_cast<const Timestamp*>(payload);
+      break;
+    case MessageType::RAW_IMU_OUTPUT:
+    case MessageType::GNSS_ATTITUDE_OUTPUT:
+      ts = &reinterpret_cast<const MeasurementDetails*>(payload)->p1_time;
       break;
     default:
       return false;
   }
-  const auto* ts = reinterpret_cast<const Timestamp*>(payload);
   if (ts->seconds == Timestamp::INVALID) {
     return false;
   }
