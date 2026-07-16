@@ -12,6 +12,7 @@
 #include "fusion_engine_interface.hpp"
 #include "errors.hpp"
 #include "clock_sync.hpp"
+#include "race_msgs/msg/wheel_speed_report.hpp"
 
 class FusionEngineNode : public rclcpp::Node
 {
@@ -37,6 +38,10 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr nav_fix_publisher_;
   rclcpp::Publisher<nmea_msgs::msg::Sentence>::SharedPtr nmea_publisher_;
   rclcpp::Subscription<mavros_msgs::msg::RTCM>::SharedPtr subscription_;
+  rclcpp::Subscription<race_msgs::msg::WheelSpeedReport>::SharedPtr wheel_speed_sub_;
+
+  bool enable_wheel_speed_input_;
+  uint32_t wheel_input_seq_ = 0;
 
   uint16_t satellite_nb_;
 
@@ -58,6 +63,10 @@ private:
 
 
   void rosServiceLoop();
+
+  /// Encode a wheel-speed report as a FusionEngine WheelSpeedInput and write it
+  /// to the device over the active connection.
+  void onWheelSpeedReport(const race_msgs::msg::WheelSpeedReport::SharedPtr msg);
 };
 
 #endif  // FUSION_ENGINE_DRIVER__CORE__FUSION_ENGINE_NODE_HPP_
