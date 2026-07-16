@@ -20,10 +20,10 @@ FusionEngineNode::FusionEngineNode(const rclcpp::NodeOptions & options)
   std::string pcap_file = declare_parameter("pcap_file", "");
 
   // Clock sync: map device (p1) time -> host clock so bursty transport delivery
-  // stops contaminating measurement timestamps. Off by default; leave disabled on
+  // stops contaminating measurement timestamps. On by default; disable on
   // systems already disciplined in the background (PTP / GPS-PPS / chrony).
   art::ClockSync::Config clock_cfg;
-  clock_cfg.enabled = declare_parameter("enable_clock_sync", false);
+  clock_cfg.enabled = declare_parameter("enable_clock_sync", true);
   clock_cfg.window_sec = declare_parameter("clock_sync.window_sec", 2.0);
   clock_cfg.min_samples = static_cast<std::size_t>(
     declare_parameter("clock_sync.min_samples", 50));
