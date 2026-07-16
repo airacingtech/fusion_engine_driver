@@ -21,6 +21,8 @@
 #include "raw_msgs.hpp"
 #include "ros_msgs.hpp"
 #include "sbf_msgs.hpp"
+#include "sbf_framer.hpp"
+#include "clock_sync.hpp"
 #include "helper.hpp"
 
 using namespace point_one::fusion_engine::messages;
@@ -233,6 +235,108 @@ inline const auto& kSBF()
 }
 
 /******************************************************************************/
+// Pull the device P1 time (seconds) out of a payload. Two payload shapes carry it,
+// both on the same P1 clock so they share the estimator cleanly:
+//   - most measurement messages lead with `Timestamp p1_time` at offset 0
+//     (empty MessagePayload base);
+//   - RAW_IMU_OUTPUT / GNSS_ATTITUDE_OUTPUT lead with `MeasurementDetails details`,
+//     whose `p1_time` field we read (NOT its leading `measurement_time`, which is a
+//     source-dependent base that would poison the shared offset).
+// Types without either keep receipt time.
+inline bool extractP1TimeSeconds(const MessageHeader& header,
+                                 const void* payload,
+                                 double& out)
+{
+  const Timestamp* ts = nullptr;
+  switch (header.message_type) {
+    case MessageType::POSE:
+    case MessageType::POSE_AUX:
+    case MessageType::CALIBRATION_STATUS:
+    case MessageType::GNSS_INFO:
+    case MessageType::GNSS_SIGNALS:
+    case MessageType::RELATIVE_ENU_POSITION:
+    case MessageType::IMU_OUTPUT:
+    case MessageType::WHEEL_SPEED_OUTPUT:
+    case MessageType::VEHICLE_SPEED_OUTPUT:
+    case MessageType::ROS_POSE:
+    case MessageType::ROS_GPS_FIX:
+    case MessageType::ROS_IMU:
+      ts = reinterpret_cast<const Timestamp*>(payload);
+      break;
+    case MessageType::RAW_IMU_OUTPUT:
+    case MessageType::GNSS_ATTITUDE_OUTPUT:
+      ts = &reinterpret_cast<const MeasurementDetails*>(payload)->p1_time;
+      break;
+    default:
+      return false;
+  }
+  if (ts->seconds == Timestamp::INVALID) {
+    return false;
+  }
+  out = static_cast<double>(ts->seconds) +
+        static_cast<double>(ts->fraction_ns) * 1e-9;
+  return true;
+}
+
+/******************************************************************************/
+// Route an INPUT_DATA_WRAPPER carrying SBF through a stateful framer that
+// reassembles complete SBF blocks across wrapper messages (the SBF byte stream
+// does not align to wrapper boundaries), then dispatch each block to its handler.
+inline void handleInputDataWrapper(rclcpp::Node* node,
+                                   const MessageHeader& header,
+                                   const void* payload,
+                                   const std::string& frame_id,
+                                   const rclcpp::Time& stamp)
+{
+  const auto& contents =
+    *reinterpret_cast<const InputDataWrapperMessage*>(payload);
+  if (contents.data_type != static_cast<uint16_t>(InputDataType::SBF_DATA)) {
+    return;
+  }
+  const uint8_t* inner =
+    reinterpret_cast<const uint8_t*>(payload) + sizeof(InputDataWrapperMessage);
+  const size_t inner_size =
+    header.payload_size_bytes - sizeof(InputDataWrapperMessage);
+
+  // Dedicated clock-sync estimator for the SBF stream. SBF carries GPS time
+  // (WNc/TOW) -- a different clock from the FusionEngine p1_time -- so it needs
+  // its own estimator; feeding GPS time into the p1 one would poison the offset.
+  // Tuned for the ~10 Hz PVT rate (longer window, fewer min samples).
+  static art::ClockSync sbf_clock([node] {
+      art::ClockSync::Config c;
+      c.enabled = node->get_parameter("enable_clock_sync").as_bool();
+      c.window_sec = 10.0;
+      c.min_samples = 20;
+      return c;
+    } ());
+
+  // Reassemble complete SBF blocks across wrapper messages and dispatch each to
+  // its handler, stamped with its own GPS measurement time mapped to the host.
+  static SbfFramer framer;
+  framer.push(inner, inner_size,
+    [node, &frame_id, &stamp](const uint8_t* block, size_t /*length*/) {
+      const uint16_t block_num = (block[4] | (block[5] << 8)) & 0x1FFF;
+      const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
+      if (it == kSBF().end()) {
+        return;
+      }
+      const uint8_t* body = block + 8;
+      // Standard SBF time header at the body start: TOW (u4, ms) + WNc (u2).
+      const uint32_t tow = body[0] | (body[1] << 8) |
+                           (body[2] << 16) | (static_cast<uint32_t>(body[3]) << 24);
+      const uint16_t wnc = body[4] | (body[5] << 8);
+      rclcpp::Time block_stamp = stamp;
+      if (tow != 0xFFFFFFFFu && wnc != 0xFFFFu) {  // not do-not-use
+        const double gps_s =
+          static_cast<double>(wnc) * 604800.0 + static_cast<double>(tow) * 1e-3;
+        const double host_s = sbf_clock.update(gps_s, stamp.seconds());
+        block_stamp = stamp - rclcpp::Duration::from_seconds(stamp.seconds() - host_s);
+      }
+      it->second(node, body, frame_id, block_stamp);
+    });
+}
+
+/******************************************************************************/
 inline const Handler& findHandler(const MessageHeader& header)
 {
   static const Handler kNoOp = [](auto*, auto*, const std::string&, const rclcpp::Time&) {};
@@ -253,25 +357,7 @@ inline const Handler& findHandler(const MessageHeader& header)
   if (header.message_type == MessageType::INPUT_DATA_WRAPPER) {
     static Handler kSBFOp;
     kSBFOp = [&header](auto* n, auto* p, const std::string& f, const rclcpp::Time& t) {
-      auto& contents = *reinterpret_cast<const point_one::fusion_engine::messages::InputDataWrapperMessage*>(p);
-      if (contents.data_type != static_cast<uint16_t>(InputDataType::SBF_DATA))
-        return;
-
-      const uint8_t* inner_payload = reinterpret_cast<const uint8_t*>(p) + sizeof(InputDataWrapperMessage);
-      const size_t inner_size = header.payload_size_bytes - sizeof(InputDataWrapperMessage);
-      if (!isSBF(inner_payload, inner_size))
-        return;
-
-      const uint16_t block_id = inner_payload[4] | (inner_payload[5] << 8);
-      const uint16_t block_num = block_id & 0x1FFF;
-      const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));
-      if (it != kSBF().end()) {
-        it->second(n, inner_payload + 8, f, t);
-      } else {
-        RCLCPP_DEBUG(n->get_logger(),
-                     "No registered SBF handler for block 0x%04X (%s)",
-                     block_num, to_string(block_num).c_str());
-      }
+      handleInputDataWrapper(n, header, p, f, t);
     };
     return kSBFOp;
   }

@@ -13,6 +13,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include "tcp_listener.hpp"
+#include "udp_listener.hpp"
 #include "tty_listener.hpp"
 #include "pcap_listener.hpp"
 
@@ -51,7 +52,9 @@ public:
    * @param tcp_ip The IP address of the TCP server.
    * @param tcp_port The port number used by the server.
    */
-  void initialize(rclcpp::Node * node, const std::string & tcp_ip, int tcp_port);
+  void initialize(
+    rclcpp::Node * node, const std::string & ip, int port,
+    const std::string & protocol = "tcp");
 
   /**
    * @brief Initialize the Fusion Engine interface with the correct type of data
