@@ -82,6 +82,18 @@ int TcpListener::open()
 /******************************************************************************/
 void TcpListener::write(uint8_t * data, size_t size)
 {
-  static_cast < void > (data);
-  static_cast < void > (size);
+  if (sock_ <= 0) {
+    return;
+  }
+  size_t total_sent = 0;
+  while (total_sent < size) {
+    ssize_t sent = send(sock_, data + total_sent, size - total_sent, MSG_NOSIGNAL);
+    if (sent < 0) {
+      RCLCPP_WARN(
+        node_->get_logger(), "Error writing to socket: %s (%d)",
+        std::strerror(errno), errno);
+      return;
+    }
+    total_sent += static_cast<size_t>(sent);
+  }
 }

@@ -31,6 +31,7 @@ find_package(visualization_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(nmea_msgs REQUIRED)
 find_package(fusion_engine_msgs REQUIRED)
+find_package(race_msgs REQUIRED)
 
 find_library(PCAP_LIBRARY pcap)
 include_directories(./core ./utils ./transport ./communication)
@@ -60,6 +61,7 @@ ament_target_dependencies(${PROJECT_NAME}_node
   mavros_msgs
   nmea_msgs
   fusion_engine_msgs
+  race_msgs
 )
 
 rclcpp_components_register_node(${PROJECT_NAME}_node
