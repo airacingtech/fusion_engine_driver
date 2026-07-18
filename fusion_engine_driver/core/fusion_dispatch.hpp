@@ -290,7 +290,9 @@ inline void handleInputDataWrapper(rclcpp::Node* node,
 {
   const auto& contents =
     *reinterpret_cast<const InputDataWrapperMessage*>(payload);
-  if (contents.data_type != static_cast<uint16_t>(InputDataType::SBF_DATA)) {
+  const uint16_t data_type = contents.data_type;
+  if (data_type != static_cast<uint16_t>(InputDataType::SBF_DATA) &&
+      data_type != static_cast<uint16_t>(InputDataType::SBF_DATA_ALT)) {
     return;
   }
   const uint8_t* inner =
@@ -312,8 +314,9 @@ inline void handleInputDataWrapper(rclcpp::Node* node,
 
   // Reassemble complete SBF blocks across wrapper messages and dispatch each to
   // its handler, stamped with its own GPS measurement time mapped to the host.
-  static SbfFramer framer;
-  framer.push(inner, inner_size,
+  // One framer per data_type so distinct wrapped streams can never interleave.
+  static std::unordered_map<uint16_t, SbfFramer> framers;
+  framers[data_type].push(inner, inner_size,
     [node, &frame_id, &stamp](const uint8_t* block, size_t /*length*/) {
       const uint16_t block_num = (block[4] | (block[5] << 8)) & 0x1FFF;
       const auto it = kSBF().find(static_cast<SBFBlockID>(block_num));

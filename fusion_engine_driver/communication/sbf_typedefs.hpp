@@ -17,9 +17,12 @@
 // FusionEngine Input Data Types
 // ============================================================
 
+// SBF relay tag differs across Atlas firmware: the AV24 primary unit wraps the
+// mosaic stream as 0x00A1, the bench/secondary unit as 0x00B8.
 enum class InputDataType : uint16_t {
   UNKNOWN           = 0x0000,
-  SBF_DATA          = 0x00B8,  // Septentrio Binary Format (observed PointOne data_type)
+  SBF_DATA          = 0x00A1,  // Septentrio Binary Format (AV24 primary Atlas)
+  SBF_DATA_ALT      = 0x00B8,  // Septentrio Binary Format (bench/secondary Atlas)
 };
 
 enum class SBFBlockID : uint16_t {
