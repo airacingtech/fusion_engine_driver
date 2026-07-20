@@ -49,6 +49,13 @@ private:
 
   std::string frame_id_;
 
+  // p1 -> GPS clock offset, taken exactly from POSE messages that carry the
+  // same instant on both clocks. ClockSync remains the GPS-denied fallback.
+  int64_t p1_to_gps_ns_ = 0;
+  bool have_p1_to_gps_ = false;
+  int64_t last_p1_ns_ = 0;
+  bool have_last_p1_ = false;
+
   std::unique_ptr<art::ClockSync> clock_sync_;
 
 

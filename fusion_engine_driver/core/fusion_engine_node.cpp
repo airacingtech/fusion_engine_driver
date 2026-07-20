@@ -144,13 +144,41 @@ void FusionEngineNode::handleFusionMessage(
   const rclcpp::Time arrival = this->now();
   rclcpp::Time stamp = arrival;
 
-  double device_s;
-  if (extractP1TimeSeconds(header, payload, device_s)) {
-    const double host_s = clock_sync_->update(device_s, arrival.seconds());
-    // corr is 0 while disabled/warming up (host_s == arrival); otherwise the
-    // small subtraction preserves arrival's nanosecond precision.
-    const double corr_s = arrival.seconds() - host_s;
-    stamp = arrival - rclcpp::Duration::from_seconds(corr_s);
+  // POSE carries the same instant on both device clocks; their difference is an
+  // exact p1 -> GPS offset with no transport latency in it. The device holds it
+  // through short GNSS outages (gps_time goes INVALID, last offset stays valid;
+  // p1 drift vs GPS is negligible over an outage).
+  if (header.message_type == MessageType::POSE) {
+    // Qualified: `using namespace ...messages::ros` also exposes a PoseMessage.
+    const auto& pose =
+      *reinterpret_cast<const point_one::fusion_engine::messages::PoseMessage*>(payload);
+    if (pose.p1_time.seconds != Timestamp::INVALID &&
+        pose.gps_time.seconds != Timestamp::INVALID) {
+      p1_to_gps_ns_ = timestampNs(pose.gps_time) - timestampNs(pose.p1_time);
+      have_p1_to_gps_ = true;
+    }
+  }
+
+  int64_t p1_ns;
+  if (extractP1TimeNs(header, payload, p1_ns)) {
+    // Backward p1 jump => device reset: the p1 epoch restarted, so the learned
+    // offset is garbage until the next valid POSE refreshes it.
+    if (have_last_p1_ && p1_ns < last_p1_ns_ - art::kNsPerSec) {
+      have_p1_to_gps_ = false;
+    }
+    last_p1_ns_ = p1_ns;
+    have_last_p1_ = true;
+
+    if (have_p1_to_gps_) {
+      stamp = rclcpp::Time(art::gps_ns_to_unix_ns(p1_ns + p1_to_gps_ns_), RCL_ROS_TIME);
+    } else {
+      // GPS-denied fallback: envelope-estimated p1 -> host mapping. corr is 0
+      // while disabled/warming up (host_s == arrival); the small subtraction
+      // preserves arrival's nanosecond precision.
+      const double host_s = clock_sync_->update(p1_ns * 1e-9, arrival.seconds());
+      const double corr_s = arrival.seconds() - host_s;
+      stamp = arrival - rclcpp::Duration::from_seconds(corr_s);
+    }
   }
 
   findHandler(header)(this, payload, frame_id_, stamp);

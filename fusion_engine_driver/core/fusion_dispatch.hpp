@@ -22,7 +22,7 @@
 #include "ros_msgs.hpp"
 #include "sbf_msgs.hpp"
 #include "sbf_framer.hpp"
-#include "clock_sync.hpp"
+#include "gps_time.hpp"
 #include "helper.hpp"
 
 using namespace point_one::fusion_engine::messages;
@@ -235,17 +235,24 @@ inline const auto& kSBF()
 }
 
 /******************************************************************************/
-// Pull the device P1 time (seconds) out of a payload. Two payload shapes carry it,
-// both on the same P1 clock so they share the estimator cleanly:
+inline int64_t timestampNs(const Timestamp& ts)
+{
+  return static_cast<int64_t>(ts.seconds) * art::kNsPerSec +
+         static_cast<int64_t>(ts.fraction_ns);
+}
+
+/******************************************************************************/
+// Pull the device P1 time (ns) out of a payload. Two payload shapes carry it,
+// both on the same P1 clock:
 //   - most measurement messages lead with `Timestamp p1_time` at offset 0
 //     (empty MessagePayload base);
 //   - RAW_IMU_OUTPUT / GNSS_ATTITUDE_OUTPUT lead with `MeasurementDetails details`,
 //     whose `p1_time` field we read (NOT its leading `measurement_time`, which is a
-//     source-dependent base that would poison the shared offset).
+//     source-dependent base on a different clock).
 // Types without either keep receipt time.
-inline bool extractP1TimeSeconds(const MessageHeader& header,
-                                 const void* payload,
-                                 double& out)
+inline bool extractP1TimeNs(const MessageHeader& header,
+                            const void* payload,
+                            int64_t& out)
 {
   const Timestamp* ts = nullptr;
   switch (header.message_type) {
@@ -273,8 +280,7 @@ inline bool extractP1TimeSeconds(const MessageHeader& header,
   if (ts->seconds == Timestamp::INVALID) {
     return false;
   }
-  out = static_cast<double>(ts->seconds) +
-        static_cast<double>(ts->fraction_ns) * 1e-9;
+  out = timestampNs(*ts);
   return true;
 }
 
@@ -300,20 +306,8 @@ inline void handleInputDataWrapper(rclcpp::Node* node,
   const size_t inner_size =
     header.payload_size_bytes - sizeof(InputDataWrapperMessage);
 
-  // Dedicated clock-sync estimator for the SBF stream. SBF carries GPS time
-  // (WNc/TOW) -- a different clock from the FusionEngine p1_time -- so it needs
-  // its own estimator; feeding GPS time into the p1 one would poison the offset.
-  // Tuned for the ~10 Hz PVT rate (longer window, fewer min samples).
-  static art::ClockSync sbf_clock([node] {
-      art::ClockSync::Config c;
-      c.enabled = node->get_parameter("enable_clock_sync").as_bool();
-      c.window_sec = 10.0;
-      c.min_samples = 20;
-      return c;
-    } ());
-
   // Reassemble complete SBF blocks across wrapper messages and dispatch each to
-  // its handler, stamped with its own GPS measurement time mapped to the host.
+  // its handler, stamped with its own GPS measurement time converted to UTC.
   // One framer per data_type so distinct wrapped streams can never interleave.
   static std::unordered_map<uint16_t, SbfFramer> framers;
   framers[data_type].push(inner, inner_size,
@@ -330,10 +324,7 @@ inline void handleInputDataWrapper(rclcpp::Node* node,
       const uint16_t wnc = body[4] | (body[5] << 8);
       rclcpp::Time block_stamp = stamp;
       if (tow != 0xFFFFFFFFu && wnc != 0xFFFFu) {  // not do-not-use
-        const double gps_s =
-          static_cast<double>(wnc) * 604800.0 + static_cast<double>(tow) * 1e-3;
-        const double host_s = sbf_clock.update(gps_s, stamp.seconds());
-        block_stamp = stamp - rclcpp::Duration::from_seconds(stamp.seconds() - host_s);
+        block_stamp = rclcpp::Time(art::gps_week_ms_to_unix_ns(wnc, tow), RCL_ROS_TIME);
       }
       it->second(node, body, frame_id, block_stamp);
     });

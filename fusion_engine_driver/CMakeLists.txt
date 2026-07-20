@@ -89,6 +89,9 @@ if(BUILD_TESTING)
   ament_add_gtest(test_clock_sync test/test_clock_sync.cpp)
   target_include_directories(test_clock_sync PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/utils)
+  ament_add_gtest(test_gps_time test/test_gps_time.cpp)
+  target_include_directories(test_gps_time PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils)
 endif()
 
 ament_export_dependencies(rosidl_default_runtime)
